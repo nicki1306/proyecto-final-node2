@@ -1,0 +1,14 @@
+{
+    "name": "proyecto-final-node2",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "start": "concurrently \"npm run server\" \"npm run client\"",
+        "server": "cd backend && npm start",
+        "client": "cd frontend && npm start"
+    },
+    "dependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
