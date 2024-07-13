@@ -1,44 +1,37 @@
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import config from '../config.js';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import bcrypt from 'bcryptjs';
-import mongoose from 'mongoose';
 
+import config from '../config.js';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
-export const isValidPassword = (user, password) => bcrypt.compareSync(password, user.password)
+export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareSync(passwordToVerify, storedHash);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+export const createToken = (payload, duration) => jwt.sign(payload, config.SECRET, { expiresIn: duration });
+export const verifyToken = (req, res, next) => {
 
+    const headerToken = req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined;
+    const cookieToken = req.cookies && req.cookies[`${config.APP_NAME}_cookie`] ? req.cookies[`${config.APP_NAME}_cookie`] : undefined;
+    const queryToken = req.query.access_token ? req.query.access_token : undefined;
+    const receivedToken = headerToken || cookieToken || queryToken;
 
-export const generateToken = (user) => {
+    if (!receivedToken) return res.status(401).send({ origin: config.SERVER, payload: 'Se requiere token' });
 
-    const token = jwt.sign({
-        _id: user._id,
-        name: user.name,
-        email: user.email
-    }, config.SECRET, {
-        
-        expiresIn: '24h'
-
+    jwt.verify(receivedToken, config.SECRET, (err, payload) => {
+        if (err) return res.status(403).send({ origin: config.SERVER, payload: 'Token no válido' });
+        req.user = payload;
+        next();
     });
-    return token;
-    }
+}
 
-    
+export const verifyRequiredBody = (requiredFields) => {
+    return (req, res, next) => {
+        const allOk = requiredFields.every(field =>
+            req.body.hasOwnProperty(field) && req.body[field] !== '' && req.body[field] !== null && req.body[field] !== undefined
+        );
 
+        if (!allOk) return res.status(400).send({ origin: config.SERVER, payload: 'Faltan propiedades', requiredFields });
 
-
-
-
-
-
-
-
-
-
-export default __dirname;
-
+        next();
+    };
+};

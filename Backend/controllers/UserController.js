@@ -1,6 +1,35 @@
 import User from '../models/UserModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { createHash, isValidPassword, createToken } from '../services/utils.js';
+
+class UserManager {
+    async createUser(data) {
+        const { name, email, password } = data;
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            throw new Error('User already exists');
+        }
+
+        const hashedPassword = createHash(password);
+        const newUser = new User({ name, email, password: hashedPassword });
+
+        await newUser.save();
+        return newUser;
+    }
+
+    async authenticateUser(email, password) {
+        const user = await User.findOne({ email });
+        if (!user || !isValidPassword(user, password)) {
+            throw new Error('Invalid email or password');
+        }
+
+        const token = createToken(user);
+        return { user, token };
+    }
+}
+
 
 export const registerUser = async (req, res) => {
     const { username, email, password } = req.body;
@@ -29,3 +58,5 @@ export const loginUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export default new UserManager();
