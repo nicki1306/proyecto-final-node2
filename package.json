@@ -10,6 +10,8 @@
     },
     "dependencies": {
         "axios": "^1.7.2",
+        "comander": "^0.0.1-security",
+        "commander": "^12.1.0",
         "concurrently": "^8.2.2",
         "socket.io-client": "^4.7.5"
     }

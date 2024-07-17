@@ -1,6 +1,6 @@
 import path from 'path';
 import dotenv from 'dotenv';
-import { Command } from 'concurrently';
+import { Command } from 'commander';
 
 const commandLine = new Command();
 commandLine
@@ -10,13 +10,13 @@ commandLine
 commandLine.parse();
 const clOptions = commandLine.opts();
 
-dotenv.config({ path: clOptions.mode === 'setup' ? path.join(__dirname, '../.env.setup') : path.join(__dirname, '../.env') });
+dotenv.config({ path: clOptions.server === 'prod' ? '.env.prod': '.env.dev' });
 
 const config = {
     APP_NAME: 'Proyecto Node',
     PORT: process.env.PORT || clOptions.port || 8080,
     SERVER: 'ATLAS',
-    MONGO_URI: 'mongodb+srv://nicki:gatito1306.@cluster0.sxitpsr.mongodb.net/',
+    MONGO_URI: process.env.MONGO_URI || 'mongodb+srv://nicki:gatito1306.@cluster0.sxitpsr.mongodb.net/',
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
     DIRNAME: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')),
     PRODUCTS_PER_PAGE: 10,

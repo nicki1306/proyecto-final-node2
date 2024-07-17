@@ -29,16 +29,21 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(cors({
     origin: 'http://localhost:8080',
+    credentials: true,
 }));
+
+// Configuraciones
 app.use(cookieParser(config.SECRET));
 app.use(session({
     secret: config.SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false },
-}));
+}));    
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -73,9 +78,9 @@ app.use('/api/user', userRouter);
 app.use('/api/auth', AuthRouter);
 
 // Iniciar el servidor y conectar a MongoDB
-const expressInstance = app.listen(config.PORT, async () => {
+const expressInstance = app.listen(config.PORT, () => {
     try {
-        await MongoSingleton.getInstance();
+        MongoSingleton.getInstance();
         console.log(`Servidor escuchando en http://localhost:${config.PORT}`);
     } catch (error) {
         console.error('Error al conectar a MongoDB:', error);
