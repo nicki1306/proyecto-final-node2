@@ -36,9 +36,9 @@ app.use(cors({
 }));
 
 // Configuraciones
-app.use(cookieParser(config.SECRET));
+app.use(cookieParser(process.env.SECRET));
 app.use(session({
-    secret: config.SECRET,
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false },
@@ -78,10 +78,12 @@ app.use('/api/user', userRouter);
 app.use('/api/auth', AuthRouter);
 
 // Iniciar el servidor y conectar a MongoDB
-const expressInstance = app.listen(config.PORT, () => {
+const PORT = process.env.PORT || 8080;
+
+const expressInstance = app.listen(PORT, () => {
     try {
         MongoSingleton.getInstance();
-        console.log(`Servidor escuchando en http://localhost:${config.PORT}`);
+        console.log(`Servidor escuchando en http://localhost:${PORT}`);
     } catch (error) {
         console.error('Error al conectar a MongoDB:', error);
         process.exit(1);
