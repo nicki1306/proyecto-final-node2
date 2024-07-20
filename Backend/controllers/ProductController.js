@@ -1,5 +1,5 @@
 import Product from '../models/ProductModel.js';
-import axios from 'axios';
+
 
 export const getProducts = async (req, res) => {
     try {

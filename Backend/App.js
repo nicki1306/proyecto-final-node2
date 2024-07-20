@@ -30,10 +30,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(cors({
-    origin: 'http://localhost:8080',
-    credentials: true,
-}));
+// app.use(cors({
+//     origin: 'http://localhost:8080',
+//     credentials: true,
+// }));
 
 // Configuraciones
 app.use(cookieParser(process.env.SECRET));
@@ -54,7 +54,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Rutas
 app.get('/', (req, res) => {
     res.cookie('testCookie', 'testValue', { httpOnly: true });
-    res.send('Cookie is set');
+    res.send(["Hello World!"]);
 });
 
 app.post('/login', passport.authenticate('local', {
