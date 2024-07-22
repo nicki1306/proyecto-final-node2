@@ -16,13 +16,11 @@ import productRouter from './routes/productRoutes.js';
 import cartRouter from './routes/CartRoutes.js';
 import userRouter from './routes/UserRoutes.js';
 import AuthRouter from './routes/AuthRoutes.js';
-import config from './config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config(); // Carga las variables de entorno
-
+dotenv.config();
 const app = express();
 
 // Middlewares
@@ -30,10 +28,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use(cors({
-//     origin: 'http://localhost:8080',
-//     credentials: true,
-// }));
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+}));
 
 // Configuraciones
 app.use(cookieParser(process.env.SECRET));
