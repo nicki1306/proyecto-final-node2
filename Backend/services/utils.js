@@ -35,3 +35,20 @@ export const verifyRequiredBody = (requiredFields) => {
         next();
     };
 };
+
+export const verifyAllowedBody = (allowedFields) => {
+    return (req, res, next) => {
+        const allOk = allowedFields.every(field =>
+            req.body.hasOwnProperty(field) && req.body[field] !== '' && req.body[field] !== null && req.body[field] !== undefined
+        );  
+        if (!allOk) return res.status(400).send({ origin: config.SERVER, payload: 'Propiedades no permitidas', allowedFields });
+        next();
+    };
+};
+
+export const verifyMongoDBId = () => {
+    return (req, res, next) => {
+        if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) return res.status(400).send({ origin: config.SERVER, payload: 'Id no valido' });
+        next();
+    };
+};

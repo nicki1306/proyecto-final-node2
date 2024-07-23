@@ -8,7 +8,8 @@ import dotenv from 'dotenv';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import passport from 'passport';
-
+import Compression from 'express';
+import businessRouter from './routes/BusinessRoutes.js';
 import initSocket from './services/socket.io.js';
 import MongoSingleton from './services/Mongosingleton.js';
 
@@ -27,10 +28,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(Compression());
 
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
 // Configuraciones
@@ -71,6 +74,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.use('/api/products', productRouter);
+app.use('/api/business', businessRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/user', userRouter);
 app.use('/api/auth', AuthRouter);
