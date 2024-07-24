@@ -4,14 +4,16 @@ import { dirname } from 'path';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import dotenv, { config } from 'dotenv';
 import session from 'express-session';
+import fileStorage from 'session-file-store';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import Compression from 'express';
 import businessRouter from './routes/BusinessRoutes.js';
 import initSocket from './services/socket.io.js';
 import MongoSingleton from './services/Mongosingleton.js';
+import errorsHandler from './services/error.handler.js';
 
 import productRouter from './routes/productRoutes.js';
 import cartRouter from './routes/CartRoutes.js';
@@ -42,7 +44,6 @@ app.use(session({
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false },
 }));    
 
 app.use(passport.initialize());
@@ -78,6 +79,13 @@ app.use('/api/business', businessRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/user', userRouter);
 app.use('/api/auth', AuthRouter);
+
+// Manejo de errores
+app.use(errorsHandler);
+
+// Manejo de archivos estáticos
+app.use('/static', express.static(`${__dirname}/public`));
+
 
 // Iniciar el servidor y conectar a MongoDB
 const PORT = process.env.PORT || 8080;

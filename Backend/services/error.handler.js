@@ -1,13 +1,13 @@
-import config, { errorDictionary } from "../config";
 
-const errorsHandler = (err, req, res, next) => {
-    if (res.headersSent) {
-        return next(err);
-    }    
-    const { origin, payload } = err;
-    const code = errorDictionary[payload];
-    if (code) {
-        return res.status(code).send({ origin, payload });
-    }    
-    return next(err);
-};
+
+const errorsHandler = (error, req, res, next) => {
+    console.log('ingresa');
+    let customErr = errorDictionary[0];
+    for (const key in errorDictionary) {
+        if (errorDictionary[key].code === error.type.code) customErr = errorDictionary[key];
+    }
+    
+    return res.status(customErr.status).send({ origin: config.SERVER, payload: '', error: customErr.message });
+}
+
+export default errorsHandler;

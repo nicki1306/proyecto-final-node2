@@ -1,7 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-
 import config from '../config.js';
+import MongoSingleton from './Mongosingleton.js';
+import CustomError from './CustomError.js';
+import { errorDictionary } from '../config.js';
+
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
@@ -30,11 +33,10 @@ export const verifyRequiredBody = (requiredFields) => {
             req.body.hasOwnProperty(field) && req.body[field] !== '' && req.body[field] !== null && req.body[field] !== undefined
         );
 
-        if (!allOk) return res.status(400).send({ origin: config.SERVER, payload: 'Faltan propiedades', requiredFields });
-
+        if (!allOk) throw new CustomError(errorDictionary.FEW_PARAMETERS, 400);};
+        
         next();
     };
-};
 
 export const verifyAllowedBody = (allowedFields) => {
     return (req, res, next) => {
@@ -46,9 +48,27 @@ export const verifyAllowedBody = (allowedFields) => {
     };
 };
 
-export const verifyMongoDBId = () => {
+export const verifyMongoDBId = (id) => {
     return (req, res, next) => {
-        if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) return res.status(400).send({ origin: config.SERVER, payload: 'Id no valido' });
+        if (!config.MONGODB_ID_REGEX.test(req.params[id])) 
+            return res.status(400).send({ origin: config.SERVER, payload: null, error: 'Id no valido' });
         next();
     };
 };
+
+export const veryfyDbConn = (req, res, next) => {
+    MongoSingleton.getInstance();
+    next();
+};
+
+export const handlePolicies = policies => {
+    return async (req, res, next) => {
+        if (!policies.includes(req.user.role)) {
+            return res.status(403).send({ origin: config.SERVER, payload: 'No autorizado' });
+        }
+        next();
+    };
+}
+
+
+
