@@ -1,3 +1,4 @@
+import config, { errorDictionary } from '../config.js';
 
 
 const errorsHandler = (error, req, res, next) => {

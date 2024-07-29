@@ -12,11 +12,22 @@ import businessRouter from './routes/BusinessRoutes.js';
 import initSocket from './services/socket.io.js';
 import MongoSingleton from './services/Mongosingleton.js';
 import errorsHandler from './services/error.handler.js';
+import cluster from 'cluster';
 
+import TestRouter from './routes/test.routes.js';
 import productRouter from './routes/productRoutes.js';
 import cartRouter from './routes/CartRoutes.js';
 import userRouter from './routes/UserRoutes.js';
 import AuthRouter from './routes/AuthRoutes.js';
+import addLogger from './services/logger.js';
+import cookiesRouter from './routes/cookies.routes.js';
+
+
+if (cluster.isPrimary) {
+    for (let i = 0; i < 4; i++) {
+        cluster.fork();
+    }
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,6 +48,7 @@ app.use(cors({
 }));
 
 // Configuraciones
+app.use(addLogger);
 app.use(cookieParser(process.env.SECRET));
 app.use(session({
     secret: process.env.SECRET,
@@ -77,6 +89,8 @@ app.use('/api/business', businessRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/user', userRouter);
 app.use('/api/auth', AuthRouter);
+app.use('/api/test', TestRouter);
+app.use('/api/cookies', cookiesRouter);
 
 // Manejo de errores
 app.use(errorsHandler);

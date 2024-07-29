@@ -19,6 +19,7 @@ const config = {
     MONGO_URI: process.env.MONGO_URI || 'mongodb+srv://nicki:gatito1306.@cluster0.sxitpsr.mongodb.net/',
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
     PERSISTENCE: process.env.PERSISTENCE || 'MONGO',
+    MODE: process.env.MODE || 'FORK',
 
     // Variables de entorno
     DIRNAME: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')),
@@ -40,6 +41,7 @@ const config = {
     TWILO_TOKEN: process.env.TWILIO_AUTH_TOKEN,
     TWILO_PHONE: process.env.TWILIO_PHONE,
 
+    get BASEDIR() { return this.DIRNAME.slice(0, -6) },
     get UPLOAD_DIR() { return `${this.DIRNAME}/public/images` },
 
 };
