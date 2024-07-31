@@ -64,6 +64,11 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Rutas
+app.get('*', (req, res, next) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html')); // ruta para React
+});
+
+
 app.get('/', (req, res) => {
     res.cookie('testCookie', 'testValue', { httpOnly: true });
     res.send(["el backend funciona!"]);
