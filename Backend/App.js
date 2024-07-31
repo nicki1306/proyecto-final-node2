@@ -110,7 +110,7 @@ const PORT = process.env.PORT || 8080;
 const expressInstance = app.listen(process.env.PORT, () => {
     try {
         MongoSingleton.getInstance();
-        console.log(`Servidor escuchando en http://localhost:${process.env.PORT || 8080}`);
+        console.log(`Servidor escuchando en http://localhost:${process.env.PORT || 8081}`);
     } catch (error) {
         console.error('Error al conectar a MongoDB:', error);
         process.exit(1);
