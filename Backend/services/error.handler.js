@@ -4,18 +4,13 @@ import config, { errorDictionary } from '../config.js';
 const errorsHandler = (error, req, res, next) => {
     console.log('ingresa');
 
-    const errorCode = (error?.type?.code) || 0;
+    const errorCode = error?.type?.code || 0;
+    const customErr = errorDictionary[errorCode] || errorDictionary.UNHANDLED_ERROR;
 
-    let customErr = errorDictionary[errorCode] || errorDictionary.UNHANDLED_ERROR;
-
-    for (const key in errorDictionary) {
-        if (errorDictionary[key].code === error.type.code) customErr = errorDictionary[key];
-        break;
-    }
-
+    console.log('custom error' ,customErr);
 
     const customError = {
-        
+
         name: customErr.name,
         code: customErr.code,
         status: customErr.status,
