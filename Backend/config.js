@@ -4,9 +4,9 @@ import { Command } from 'commander';
 
 const commandLine = new Command();
 commandLine
-    .option('--server <server>')
-    .option('--port <port>')
-    .option('--setup <number>')
+.option('--server <server>', 'Environment server', 'dev')
+.option('--port <port>', 'Port number')
+.option('--setup <number>', 'Setup number')
 commandLine.parse();
 const clOptions = commandLine.opts();
 
@@ -47,8 +47,8 @@ const config = {
 };
 
 export const errorDictionary = {
-    11000: 'Ya existe un usuario con ese correo',
-    11001: 'Ya existe un usuario con ese nombre de usuario',
+    11000: { code: 11000, status: 400, message: 'Ya existe un usuario con ese correo' },
+    11001: { code: 11001, status: 400, message: 'Ya existe un usuario con ese nombre de usuario' },
     UNHANDLED_ERROR: { code: 0, status: 500, message: 'Error no identificado' },
     ROUTING_ERROR: { code: 1, status: 404, message: 'No se encuentra el endpoint solicitado' },
     FEW_PARAMETERS: { code: 2, status: 400, message: 'Faltan parámetros obligatorios o se enviaron vacíos' },
@@ -62,5 +62,6 @@ export const errorDictionary = {
     RECORD_CREATION_ERROR: { code: 10, status: 500, message: 'Error al intentar crear el registro' },    
     RECORD_CREATION_OK: { code: 11, status: 200, message: 'Registro creado' }
 };
+
 
 export default config;
