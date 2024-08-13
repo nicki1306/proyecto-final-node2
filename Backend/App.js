@@ -7,7 +7,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import session from 'express-session';
 import passport from 'passport';
-import Compression from 'express';
+import Compression from 'compression';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
@@ -25,10 +25,10 @@ import AuthRouter from './routes/AuthRoutes.js';
 import addLogger from './services/logger.js';
 import cookiesRouter from './routes/cookies.routes.js';
 
+dotenv.config();
 const app = express();
 
-dotenv.config();
-
+const PORT = process.env.PORT || 8081;
 
 const swaggerOptions = {
     definition: {
@@ -42,8 +42,6 @@ const swaggerOptions = {
 };
 
 const specs = swaggerJSDoc(swaggerOptions);
-
-
 
 if (cluster.isPrimary) {
     try {
@@ -65,9 +63,8 @@ if (cluster.isPrimary) {
     // Middlewares
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(express.static(path.join(__dirname, 'public', '../backend/public')));
+    app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
     app.use(Compression());
-    
     app.use(cors({
         origin: 'http://localhost:5173',
         credentials: true,
@@ -93,8 +90,9 @@ if (cluster.isPrimary) {
 
     // Rutas
     app.get('*', (req, res, next) => {
-        res.sendFile(path.join(__dirname, 'public', 'index.html')); // ruta para React
+        res.sendFile(path.join(__dirname, 'dist', 'frontend', 'public', 'index.html'));
     });
+    
 
     app.get('/', (req, res) => {
         res.cookie('testCookie', 'testValue', { httpOnly: true });

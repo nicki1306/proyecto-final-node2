@@ -3,7 +3,11 @@ import config from '../config.js';
 
 class MongoSingleton {
     constructor() {
+        if (MongoSingleton.instance) {
+            return MongoSingleton.instance;
+        }
         this.connect();
+        MongoSingleton.instance = this;
     }
 
     async connect() {
@@ -20,10 +24,10 @@ class MongoSingleton {
     }
 
     static getInstance() {
-        if (!this.instance) {
-            this.instance = new MongoSingleton();
+        if (!MongoSingleton.instance) {
+            MongoSingleton.instance = new MongoSingleton();
         }
-        return this.instance;
+        return MongoSingleton.instance;
     }
 }
 
