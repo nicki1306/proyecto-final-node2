@@ -64,7 +64,7 @@ if (cluster.isPrimary) {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.static(path.join(__dirname, '../frontend/dist')));
-    app.use(Compression());
+    app.use(Compression({ brotli: { enabled: true }, gzip: { enabled: true } }));
     app.use(cors({
         origin: 'http://localhost:3000',
         credentials: true,
