@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(Compression({ brotli: { enabled: true }, gzip: { enabled: true } }));
 
-router.get('/', Compression({ brotli: true, gzip: true, deflate: true }), getProducts);
+router.get('/', getProducts);
 router.post('/', createProduct);
 
 export default router;

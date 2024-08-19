@@ -24,6 +24,7 @@ import userRouter from './routes/UserRoutes.js';
 import AuthRouter from './routes/AuthRoutes.js';
 import addLogger from './services/logger.js';
 import cookiesRouter from './routes/cookies.routes.js';
+import mongoose from 'mongoose';
 
 dotenv.config();
 const app = express();
