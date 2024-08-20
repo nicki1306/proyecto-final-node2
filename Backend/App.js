@@ -1,10 +1,10 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import session from 'express-session';
 import passport from 'passport';
 import Compression from 'compression';
@@ -31,6 +31,7 @@ const app = express();
 
 const PORT = process.env.PORT || 8081;
 
+
 const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
@@ -56,8 +57,6 @@ if (cluster.isPrimary) {
     }
 } else {
     // Proceso secundario (worker)
-    const app = express();
-    
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
     
@@ -128,9 +127,6 @@ if (cluster.isPrimary) {
 
     // Manejo de archivos estáticos
     app.use('/static', express.static(`${__dirname}/public`));
-
-    // Iniciar el servidor y conectar a MongoDB
-    const PORT = process.env.PORT || 8080;
 
     const expressInstance = app.listen(PORT, () => {
         console.log(`Servidor escuchando en http://localhost:${PORT}`);
