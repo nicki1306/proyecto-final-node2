@@ -13,8 +13,8 @@ class MongoSingleton {
     async connect() {
         try {
             await mongoose.connect(config.MONGO_URI, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
+                serverSelectionTimeoutMS: 5000, 
+                socketTimeoutMS: 45000,
             });
             console.log('MongoDB conectado');
         } catch (error) {

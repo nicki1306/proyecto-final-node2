@@ -88,23 +88,19 @@ if (cluster.isPrimary) {
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
 
-    // Rutas
-    app.get('*', (req, res, next) => {
-        res.sendFile(path.join(__dirname,'../frontend/dist', 'index.html'));
-    });
     
-
+    
     app.get('/', (req, res) => {
         res.cookie('testCookie', 'testValue', { httpOnly: true });
         res.send(["el backend funciona!"]);
     });
-
+    
     app.post('/login', passport.authenticate('local', {
         successRedirect: '/dashboard',
         failureRedirect: '/login',
         failureFlash: true,
     }));
-
+    
     app.get('/logout', (req, res) => {
         req.logout(err => {
             if (err) {
@@ -122,6 +118,11 @@ if (cluster.isPrimary) {
     app.use('/api/test', TestRouter);
     app.use('/api/cookies', cookiesRouter);
 
+    // Rutas
+    app.get('*', (req, res, next) => {
+        res.sendFile(path.join(__dirname,'../frontend/dist', 'index.html'));
+    });
+    
     // Manejo de errores
     app.use(errorsHandler);
 

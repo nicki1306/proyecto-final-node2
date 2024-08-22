@@ -4,6 +4,9 @@ import Product from '../models/ProductModel.js';
 export const getProducts = async (req, res) => {
     try {
         const products = await Product.find();
+        if (!products) {
+            return res.status(404).json({ message: 'No se encontraron productos' });
+        }
         res.status(200).json(products);
     } catch (error) {
         console.log('error al obtrener los productos', error);
