@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import config from '../config.js';
 
+
+mongoose.pluralize(null);
+
+
 class MongoSingleton {
     constructor() {
         if (MongoSingleton.instance) {
@@ -13,7 +17,7 @@ class MongoSingleton {
     async connect() {
         try {
             await mongoose.connect(config.MONGO_URI, {
-                serverSelectionTimeoutMS: 5000, 
+                serverSelectionTimeoutMS: 30000, 
                 socketTimeoutMS: 45000,
             });
             console.log('MongoDB conectado');

@@ -47,7 +47,9 @@ const specs = swaggerJSDoc(swaggerOptions);
 
 if (cluster.isPrimary) {
     try {
-        MongoSingleton.getInstance();
+        await MongoSingleton.getInstance();
+        console.log('MongoDB conectado');
+        
         for (let i = 0; i < 4; i++) {
             cluster.fork();
         }
