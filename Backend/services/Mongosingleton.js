@@ -20,7 +20,7 @@ class MongoSingleton {
                 serverSelectionTimeoutMS: 30000, 
                 socketTimeoutMS: 45000,
             });
-            console.log('MongoDB conectado');
+            console.log('MongoDB conectado', config.MONGO_URI);
         } catch (error) {
             console.error('Error de conexión a MongoDB:', error);
             process.exit(1);
