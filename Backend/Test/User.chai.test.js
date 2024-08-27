@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import mongoose from "mongoose";
 import User from "../models/UserModel.js";
-import UserController from '../controllers/userController.js';
 
 const testUser = {
     name: 'Test User',
