@@ -1,4 +1,3 @@
-
 import Cart from '../models/CartModel.js';
 import Product from '../models/ProductModel.js';
 
@@ -11,6 +10,7 @@ export const getCart = async (req, res) => {
         }
         res.json(cart);
     } catch (error) {
+        console.error('Error al obtener el carrito:', error);
         res.status(500).json({ message: 'Error al obtener el carrito', error });
     }
 };
@@ -31,16 +31,22 @@ export const addToCart = async (req, res) => {
         if (productIndex >= 0) {
             cart.products[productIndex].quantity += quantity;
         } else {
+            const productExists = await Product.findById(productId);
+            if (!productExists) {
+                return res.status(404).json({ message: 'Producto no encontrado' });
+            }
             cart.products.push({ productId, quantity });
         }
 
         await cart.save();
         res.status(201).json(cart);
     } catch (error) {
+        console.error('Error al agregar el producto al carrito:', error);
         res.status(500).json({ message: 'Error al agregar el producto al carrito', error });
     }
 };
 
+// Eliminar producto del carrito
 export const removeFromCart = async (req, res) => {
     const { productId } = req.body;
 
@@ -56,10 +62,12 @@ export const removeFromCart = async (req, res) => {
         await cart.save();
         res.status(200).json(cart);
     } catch (error) {
+        console.error('Error al eliminar el producto del carrito:', error);
         res.status(500).json({ message: 'Error al eliminar el producto del carrito', error });
     }
 };
 
+// Actualizar la cantidad del producto en el carrito
 export const updateCart = async (req, res) => {
     const { productId, quantity } = req.body;
 
@@ -80,6 +88,7 @@ export const updateCart = async (req, res) => {
             res.status(404).json({ message: 'Producto no encontrado en el carrito' });
         }
     } catch (error) {
+        console.error('Error al actualizar la cantidad del producto en el carrito:', error);
         res.status(500).json({ message: 'Error al actualizar la cantidad del producto en el carrito', error });
     }
 };
