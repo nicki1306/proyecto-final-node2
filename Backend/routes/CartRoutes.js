@@ -1,4 +1,4 @@
-// backend/routes/cartRoutes.js
+
 import express from 'express';
 import { getCart, addToCart, removeFromCart, updateCart } from '../controllers/CartController.js';
 import { isValidPassword } from '../services/utils.js';

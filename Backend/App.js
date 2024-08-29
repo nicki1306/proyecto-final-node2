@@ -120,9 +120,13 @@ if (cluster.isPrimary) {
     app.use('/api/test', TestRouter);
     app.use('/api/cookies', cookiesRouter);
 
-    // Rutas
-    app.get('*', (req, res, next) => {
-        res.sendFile(path.join(__dirname,'../frontend/dist', 'index.html'));
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    });
+
+    // Rutas de prueba
+    app.get('/hello', (req, res) => {
+        res.send('Hello World!');
     });
     
     // Manejo de errores

@@ -6,6 +6,7 @@ export const getProducts = async (req, res) => {
     try {
         await MongoSingleton.getInstance();
         const products = await Product.find();
+        console.log(products);
         if (!products) {
             return res.status(404).json({ message: 'No se encontraron productos' });
         }
