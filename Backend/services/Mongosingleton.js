@@ -43,3 +43,4 @@ class MongoSingleton {
 }
 
 export default MongoSingleton;
+

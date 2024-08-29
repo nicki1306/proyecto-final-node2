@@ -1,7 +1,7 @@
 import Product from '../models/ProductModel.js';
 import MongoSingleton from '../services/Mongosingleton.js';
 
-export const getProducts = async () => {
+export const getProducts = async (req, res) => {
     try {
         await MongoSingleton.getInstance();
         const products = await Product.find();
