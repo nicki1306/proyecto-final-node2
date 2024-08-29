@@ -27,6 +27,13 @@ class MongoSingleton {
         }
     }
 
+    async disconnect() {
+        if (mongoose.connection.readyState === 1) {
+            await mongoose.disconnect();
+            console.log('MongoDB desconectado');
+        }
+    }
+
     static getInstance() {
         if (!MongoSingleton.instance) {
             MongoSingleton.instance = new MongoSingleton();

@@ -1,1 +1,15 @@
-/node_modules
+# Node modules
+node_modules/
+
+# Archivos de configuración y secretos
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Directorios de construcción
+dist/
+build/

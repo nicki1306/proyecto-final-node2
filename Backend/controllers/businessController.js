@@ -21,7 +21,7 @@ class BusinessController {
 
     async get(id) {
         try {
-            return id === undefined || id === null ? await service.get(): await service.getOne(id);
+            return id === undefined || id === null ? service.get(): await service.getOne(id);
         } catch (err) {
             return err.message
         }
