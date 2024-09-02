@@ -29,6 +29,20 @@ export const getProductById = async (productId) => {
     }
 };
 
+// Actualizar un producto
+export const updateProduct = async (productId, productData) => {
+    try {
+        await MongoSingleton.getInstance();
+        const updatedProduct = await Product.findByIdAndUpdate(productId, productData, { new: true });
+        if (!updatedProduct) {
+            throw new Error('No se encontró el producto'); 
+        }
+        return updatedProduct; 
+    } catch (error) {
+        throw new Error('Error al actualizar el producto'); 
+    }
+};
+
 // Crear un nuevo producto
 export const createProduct = async (productData) => {
     try {
@@ -37,5 +51,24 @@ export const createProduct = async (productData) => {
         return savedProduct;
     } catch (error) {
         throw new Error('Error al crear el producto'); 
+    }
+};
+
+// Obtener productos por categoría
+export const getProductsByCategory = async (category) => {
+    return await Product.find({ category });
+};
+
+// Eliminar un producto
+export const deleteProduct = async (productId) => {
+    try {
+        await MongoSingleton.getInstance();
+        const deletedProduct = await Product.findByIdAndDelete(productId);
+        if (!deletedProduct) {
+            throw new Error('No se encontró el producto'); 
+        }
+        return deletedProduct; 
+    } catch (error) {
+        throw new Error('Error al eliminar el producto'); 
     }
 };

@@ -92,3 +92,16 @@ export const updateCart = async (req, res) => {
         res.status(500).json({ message: 'Error al actualizar la cantidad del producto en el carrito', error });
     }
 };
+
+export const checkout = async (req, res) => {
+    try {
+        const cart = await Cart.findOne({ userId: req.user._id }).populate('products.productId');
+        if (!cart) {
+            return res.status(404).json({ message: 'Carrito no encontrado' });
+        }
+        res.json(cart);
+    } catch (error) {
+        console.error('Error al obtener el carrito:', error);
+        res.status(500).json({ message: 'Error al obtener el carrito', error });
+    }
+}
