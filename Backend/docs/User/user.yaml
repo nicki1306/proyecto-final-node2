@@ -117,19 +117,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: User deleted
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  message:
-                    type: string
-                    example: User deleted
+        "204":
+          description: User deleted successfully
 components:
   schemas:
     User:
@@ -147,3 +136,10 @@ components:
           type: string
         pets:
           type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string

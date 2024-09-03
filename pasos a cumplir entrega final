@@ -11,7 +11,6 @@
 - Logging (registro de sucesos con Winston).
 
 - Documentación de usuario (con Swagger).
-
 NO es necesario documentar TODA la API.
 
 - Incluir carpeta test con al menos UN archivo de testing unitario y UN archivo de integración.

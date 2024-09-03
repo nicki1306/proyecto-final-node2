@@ -8,11 +8,11 @@ servers:
 paths:
   /api/products:
     get:
-      summary: Get all users
-      description: Retrieve a list of all users
+      summary: Get all products
+      description: Retrieve a list of all products
       responses:
         "200":
-          description: A list of users
+          description: A list of products
           content:
             application/json:
               schema:
@@ -25,13 +25,97 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Product"
-
+    post:
+      summary: Create a new product
+      description: Add a new product to the collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "201":
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    $ref: "#/components/schemas/Product"
+  /api/products/{id}:
+    get:
+      summary: Get a product by ID
+      description: Retrieve details of a specific product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A product object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+    put:
+      summary: Update a product by ID
+      description: Update the details of a specific product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "200":
+          description: Product updated successfully
+        "404":
+          description: Product not found
+    delete:
+      summary: Delete a product by ID
+      description: Delete a specific product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Product deleted successfully
+        "404":
+          description: Product not found
 components:
   schemas:
     Product:
       type: object
       properties:
-        name:
+        toy_name:
           type: string
-        stock:
+        manufacturer:
+          type: string
+        age_group:
+          type: string
+        price:
+          type: number
+        material:
+          type: string
+        color:
+          type: string
+        imageUrl:
+          type: string
+        description:
           type: string

@@ -39,15 +39,15 @@ const uploadRouter = express.Router();
 
 const swaggerOptions = {
     definition: {
-        openapi: '3.0.0',
+        openapi: '3.0.1',
         info: {
-            title: 'Backend',
+            title: 'Documentation Backend',
+            description: 'Documentación de la API Backend',
             version: '1.0.0',
         },
     },
     apis: ['./src/docs/routes/**/*.yaml.js'],
 };
-
 const specs = swaggerJSDoc(swaggerOptions);
 
 if (cluster.isPrimary) {
@@ -100,7 +100,7 @@ if (cluster.isPrimary) {
         saveUninitialized: false,
     }));
 
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+    app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
     app.use(passport.initialize());
     app.use(passport.session());
 
