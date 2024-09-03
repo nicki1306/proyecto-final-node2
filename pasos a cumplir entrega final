@@ -1,0 +1,30 @@
+- Organizar por capas MVC, repository, singleton para bbdd si es posible y presentar una estructura limpia (sin archivos no utilizados, .envs, configs Kubernetes, etc).
+
+- Usar variables de entorno. Agregar si se puede opciones de línea de comandos.
+
+- Validar las cosas!, express-validator o joi por ejemplo, en middlewares.
+
+- Buena gestión de autenticación y autorización (roles). Buen manejo de política de usuarios
+  
+- Secuencia correcta del proceso base de compra (poder registrar, ingresar, agregar productos, modificar cantidades, controlar stock, confirmar (checkout) y generar tickets).
+
+- Logging (registro de sucesos con Winston).
+
+- Documentación de usuario (con Swagger).
+
+NO es necesario documentar TODA la API.
+
+- Incluir carpeta test con al menos UN archivo de testing unitario y UN archivo de integración.
+
+- Realizar un deploy en algún servicio gratuito online.
+
+Vistas indispensables:
+
+- Registro
+
+- Login (datos locales o servicio de tercero)
+
+- Lista de productos en oferta
+
+- Vista de carrito (productos actuales, cambiar ctd, quitar, checkout = revisar stock, confirmar compra y generar ticket)
+

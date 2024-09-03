@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>File Upload</h1>
+    
+    <!-- FORMULARIO PARA IMÁGENES DE PRODUCTO -->
+    <form action="/upload/products" method="POST" enctype="multipart/form-data">
+
+        <label for="productImages">Selecciona imágenes de producto:</label>
+        <input type="file" id="productImages" name="productImages" multiple>
+        <br /><br />
+        <button type="submit">Subir imágenes de producto</button>
+    </form>
+
+    <br /><br />
+
+    <!-- FORMULARIO PARA DOCUMENTOS DE USUARIO -->
+    <form action="/upload/documents" method="POST" enctype="multipart/form-data">
+
+        <label for="documentImages">Selecciona documentos de usuario:</label>
+        <input type="file" id="documentImages" name="documentImages" multiple>
+        <br /><br />
+        <button type="submit">Subir documentos de usuario</button>
+    </form>
+</body>
+</html>

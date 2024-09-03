@@ -2,6 +2,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { uploader } from './uploader.js';
+import pkg from 'cloudinary';
+const { v2: cloudinary } = pkg;
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -10,6 +13,7 @@ import passport from 'passport';
 import Compression from 'compression';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import multer from 'multer';
 
 import businessRouter from './routes/BusinessRoutes.js';
 import initSocket from './services/socket.io.js';
@@ -31,6 +35,7 @@ const app = express();
 
 const PORT = process.env.PORT || 8081;
 
+const uploadRouter = express.Router();
 
 const swaggerOptions = {
     definition: {
@@ -49,7 +54,7 @@ if (cluster.isPrimary) {
     try {
         await MongoSingleton.getInstance();
         console.log('MongoDB conectado');
-        
+
         for (let i = 0; i < 4; i++) {
             cluster.fork();
         }
@@ -61,7 +66,20 @@ if (cluster.isPrimary) {
     // Proceso secundario (worker)
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    
+
+
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            const uploadPath = path.join(__dirname, 'uploads', req.url.split('/')[2]);
+            fs.mkdirSync(uploadPath, { recursive: true });
+            cb(null, uploadPath);
+        },
+        filename: (req, file, cb) => {
+            cb(null, `${Date.now()}-${file.originalname}`);
+        }
+    });
+
+    const upload = multer({ storage });
     // Middlewares
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -72,7 +90,7 @@ if (cluster.isPrimary) {
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
     }));
-    
+
     // Configuraciones
     app.use(addLogger);
     app.use(cookieParser(process.env.SECRET));
@@ -80,8 +98,8 @@ if (cluster.isPrimary) {
         secret: process.env.SECRET,
         resave: false,
         saveUninitialized: false,
-    }));    
-    
+    }));
+
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
     app.use(passport.initialize());
     app.use(passport.session());
@@ -90,19 +108,27 @@ if (cluster.isPrimary) {
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
 
-    
-    
+    // Ruta para subir imágenes
+    app.post('/upload/products', upload.array('image'), (req, res) => {
+        res.send('Archivo subido exitosamente');
+    });
+
+    app.post('/upload/documents', upload.array('documentImages', 10), (req, res) => {
+        res.send('Documentos de usuario subidos con éxito');
+    });
+
+    //rutas
     app.get('/', (req, res) => {
         res.cookie('testCookie', 'testValue', { httpOnly: true });
         res.send(["el backend funciona!"]);
     });
-    
+
     app.post('/login', passport.authenticate('local', {
         successRedirect: '/dashboard',
         failureRedirect: '/login',
         failureFlash: true,
     }));
-    
+
     app.get('/logout', (req, res) => {
         req.logout(err => {
             if (err) {
@@ -112,6 +138,7 @@ if (cluster.isPrimary) {
         });
     });
 
+    app.use('/api/upload', uploadRouter);
     app.use('/api/products', productRouter);
     app.use('/api/business', businessRouter);
     app.use('/api/cart', cartRouter);
@@ -128,7 +155,7 @@ if (cluster.isPrimary) {
     app.get('/hello', (req, res) => {
         res.send('Hello World!');
     });
-    
+
     // Manejo de errores
     app.use(errorsHandler);
 

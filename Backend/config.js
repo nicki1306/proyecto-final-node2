@@ -16,15 +16,23 @@ const config = {
     APP_NAME: 'Proyecto Node',
     PORT: process.env.PORT || clOptions.port || 8081 ,
     SERVER: 'ATLAS',
+    STORAGE: 'cloud',
     MONGO_URI: process.env.MONGO_URI || 'mongodb+srv://nicki:gatito1306.@cluster0.sxitpsr.mongodb.net/proyecto-node2?retryWrites=true&w=majority',
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
     PERSISTENCE: process.env.PERSISTENCE || 'MONGO',
     MODE: process.env.MODE || 'FORK',
+    PRODUCTS_PER_PAGE: 10,
+    SECRET: process.env.SECRET,
 
     // Variables de entorno
     DIRNAME: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')),
-    PRODUCTS_PER_PAGE: 10,
-    SECRET: process.env.SECRET,
+    get BASEDIR() { return this.DIRNAME.slice(0, -4) },
+    get UPLOAD_DIR() { return `${this.DIRNAME}/uploads` },
+
+    // Variables de Cloudinary
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '',
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
 
     // Variables de Github
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
