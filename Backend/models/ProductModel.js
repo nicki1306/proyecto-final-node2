@@ -11,6 +11,7 @@ const productSchema = new mongoose.Schema({
     imageUrl: { type: String, required: true },
     description: { type: String, required: true },
     category: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 });
 
 const Product = mongoose.model('Product', productSchema);

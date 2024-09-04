@@ -5,14 +5,13 @@ import MongoSingleton from './Mongosingleton.js';
 import CustomError from './CustomError.js';
 import { errorDictionary } from '../config.js';
 
-
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
 export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareSync(passwordToVerify, storedHash);
 
 export const createToken = (payload, duration) => jwt.sign(payload, config.SECRET, { expiresIn: duration });
-export const verifyToken = (req, res, next) => {
 
+export const verifyToken = (req, res, next) => {
     const headerToken = req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined;
     const cookieToken = req.cookies && req.cookies[`${config.APP_NAME}_cookie`] ? req.cookies[`${config.APP_NAME}_cookie`] : undefined;
     const queryToken = req.query.access_token ? req.query.access_token : undefined;
@@ -33,10 +32,11 @@ export const verifyRequiredBody = (requiredFields) => {
             req.body.hasOwnProperty(field) && req.body[field] !== '' && req.body[field] !== null && req.body[field] !== undefined
         );
 
-        if (!allOk) throw new CustomError(errorDictionary.FEW_PARAMETERS, 400);};
-        
+        if (!allOk) throw new CustomError(errorDictionary.FEW_PARAMETERS, 400);
+
         next();
     };
+};
 
 export const verifyAllowedBody = (allowedFields) => {
     return (req, res, next) => {
@@ -56,7 +56,7 @@ export const verifyMongoDBId = (id) => {
     };
 };
 
-export const veryfyDbConn = (req, res, next) => {
+export const verifyDbConn = (req, res, next) => {
     MongoSingleton.getInstance();
     next();
 };
@@ -68,8 +68,4 @@ export const handlePolicies = policies => {
         }
         next();
     };
-}
-
-
-
-
+};
