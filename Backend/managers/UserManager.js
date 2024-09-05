@@ -1,7 +1,7 @@
 // managers/UserManager.js
 import User from '../models/UserModel.js';
 import bcrypt from 'bcrypt';
-import { createHash, isValidPassword, generateToken } from '../services/utils.js';
+import { generateToken } from '../services/utils.js';
 
 class UserManager {
     async registerUser(data) {

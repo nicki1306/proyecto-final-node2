@@ -1,4 +1,6 @@
 import UserManager from '../managers/UserManager.js';
+import User from '../models/UserModel.js';
+import bcrypt from 'bcrypt';
 
 export const registerUser = async (req, res) => {
     try {
@@ -9,8 +11,8 @@ export const registerUser = async (req, res) => {
         }
 
         const hashedPassword = bcrypt.hashSync(password, 10);
-        const newUser = new User({ name, email, password: hashedPassword });
-        await newUser.save();
+        const user = await UserManager.registerUser({ name, email, password });
+        res.status(201).json(user);
         res.status(201).json(newUser);
     } catch (error) {
         console.error('Error registering user:', error);
