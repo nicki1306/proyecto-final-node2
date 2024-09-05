@@ -1,6 +1,7 @@
 // managers/UserManager.js
 import User from '../models/UserModel.js';
-import { createHash, isValidPassword, createToken } from '../services/utils.js';
+import bcrypt from 'bcrypt';
+import { createHash, isValidPassword, generateToken } from '../services/utils.js';
 
 class UserManager {
     async registerUser(data) {
@@ -11,9 +12,8 @@ class UserManager {
             throw new Error('User already exists');
         }
 
-        const hashedPassword = createHash(password);
+        const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
         const newUser = new User({ name, email, password: hashedPassword });
-
         await newUser.save();
         return newUser;
     }
@@ -21,11 +21,16 @@ class UserManager {
     async authenticateUser(email, password) {
         const user = await User.findOne({ email });
         console.log('user', user)
-        if (!user || !isValidPassword(password, user.password)) {
+        if (!user) {
             throw new Error('Invalid email or password', user);
         }
 
-        const token = createToken({ id: user._id });
+        const isMatch = bcrypt.compareSync(password, user.password);
+        if (!isMatch) {
+            throw new Error('Invalid email or password');
+        }
+
+        const token = generateToken({ id: user._id, role: user.role });
         return { user, token };
 }
 }

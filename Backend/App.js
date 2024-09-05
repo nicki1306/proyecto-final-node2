@@ -14,17 +14,17 @@ import Compression from 'compression';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import multer from 'multer';
+import cluster from 'cluster';
 
 import businessRouter from './routes/BusinessRoutes.js';
 import initSocket from './services/socket.io.js';
 import MongoSingleton from './services/Mongosingleton.js';
 import errorsHandler from './services/error.handler.js';
-import cluster from 'cluster';
 
 import TestRouter from './routes/test.routes.js';
 import productRouter from './routes/productRoutes.js';
 import cartRouter from './routes/CartRoutes.js';
-import userRouter from './routes/UserRoutes.js';
+import userRouter from './routes/userRoutes.js';
 import AuthRouter from './routes/AuthRoutes.js';
 import addLogger from './services/logger.js';
 import cookiesRouter from './routes/cookies.routes.js';
@@ -67,12 +67,15 @@ if (cluster.isPrimary) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
 
-
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            const uploadPath = path.join(__dirname, 'uploads', req.url.split('/')[2]);
-            fs.mkdirSync(uploadPath, { recursive: true });
-            cb(null, uploadPath);
+            try {
+                const uploadPath = path.join(__dirname, 'uploads', req.url.split('/')[2]);
+                fs.mkdirSync(uploadPath, { recursive: true });
+                cb(null, uploadPath);
+            } catch (err) {
+                cb(err, uploadPath);
+            }
         },
         filename: (req, file, cb) => {
             cb(null, `${Date.now()}-${file.originalname}`);
@@ -80,6 +83,7 @@ if (cluster.isPrimary) {
     });
 
     const upload = multer({ storage });
+
     // Middlewares
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -97,12 +101,13 @@ if (cluster.isPrimary) {
     app.use(session({
         secret: process.env.SECRET,
         resave: false,
-        saveUninitialized: false,
+        saveUninitialized: true,
     }));
 
-    app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
     app.use(passport.initialize());
     app.use(passport.session());
+
+    app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
     // Configurar las vistas
     app.set('view engine', 'ejs');

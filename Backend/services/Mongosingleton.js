@@ -17,8 +17,8 @@ class MongoSingleton {
     async connect() {
         try {
             await mongoose.connect(config.MONGO_URI, {
-                serverSelectionTimeoutMS: 30000, 
-                socketTimeoutMS: 45000,
+                serverSelectionTimeoutMS: 5000, 
+                socketTimeoutMS: 4500,
             });
             console.log('MongoDB conectado', config.MONGO_URI);
         } catch (error) {

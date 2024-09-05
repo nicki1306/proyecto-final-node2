@@ -23,6 +23,7 @@ const config = {
     MODE: process.env.MODE || 'FORK',
     PRODUCTS_PER_PAGE: 10,
     SECRET: process.env.SECRET,
+    JWT_SECRET: process.env.JWT_SECRET,
 
     // Variables de entorno
     DIRNAME: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')),

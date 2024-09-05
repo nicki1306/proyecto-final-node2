@@ -1,11 +1,11 @@
 
 import express from 'express';
 import { getCart, addToCart, removeFromCart, updateCart, checkout } from '../controllers/CartController.js';
-import { isValidPassword } from '../services/utils.js';
+import { verifyToken } from '../services/utils.js';
 
 const router = express.Router();
 
-router.use(isValidPassword)
+router.use(verifyToken)
 
 router.get('/', getCart);
 router.post('/add', addToCart);

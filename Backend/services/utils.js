@@ -9,22 +9,23 @@ export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSy
 
 export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareSync(passwordToVerify, storedHash);
 
-export const createToken = (payload, duration) => jwt.sign(payload, config.SECRET, { expiresIn: duration });
+export const generateToken = (payload) => jwt.sign(payload, config.SECRET, { expiresIn: '1h' });
 
 export const verifyToken = (req, res, next) => {
-    const headerToken = req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined;
-    const cookieToken = req.cookies && req.cookies[`${config.APP_NAME}_cookie`] ? req.cookies[`${config.APP_NAME}_cookie`] : undefined;
-    const queryToken = req.query.access_token ? req.query.access_token : undefined;
-    const receivedToken = headerToken || cookieToken || queryToken;
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.status(403).json({ message: 'Token no proporcionado' });
+    }
 
-    if (!receivedToken) return res.status(401).send({ origin: config.SERVER, payload: 'Se requiere token' });
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ message: 'Token inválido o expirado' });
+        }
 
-    jwt.verify(receivedToken, config.SECRET, (err, payload) => {
-        if (err) return res.status(403).send({ origin: config.SERVER, payload: 'Token no válido' });
-        req.user = payload;
+        req.user = decoded;
         next();
     });
-}
+};
 
 export const verifyRequiredBody = (requiredFields) => {
     return (req, res, next) => {
