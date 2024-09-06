@@ -12,17 +12,17 @@ export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareS
 export const generateToken = (payload) => jwt.sign(payload, config.SECRET, { expiresIn: '1h' });
 
 export const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(' ')[1]; // Asegúrate de que el token viene correctamente
     if (!token) {
         return res.status(403).json({ message: 'Token no proporcionado' });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, config.SECRET, (err, decoded) => { // Usar config.SECRET para consistencia
         if (err) {
             return res.status(403).json({ message: 'Token inválido o expirado' });
         }
 
-        req.user = decoded;
+        req.user = decoded; // Añadir el payload decodificado a req.user
         next();
     });
 };
@@ -33,7 +33,9 @@ export const verifyRequiredBody = (requiredFields) => {
             req.body.hasOwnProperty(field) && req.body[field] !== '' && req.body[field] !== null && req.body[field] !== undefined
         );
 
-        if (!allOk) throw new CustomError(errorDictionary.FEW_PARAMETERS, 400);
+        if (!allOk) {
+            return res.status(400).json({ message: 'Faltan campos requeridos' });
+        }
 
         next();
     };
@@ -44,15 +46,18 @@ export const verifyAllowedBody = (allowedFields) => {
         const allOk = allowedFields.every(field =>
             req.body.hasOwnProperty(field) && req.body[field] !== '' && req.body[field] !== null && req.body[field] !== undefined
         );  
-        if (!allOk) return res.status(400).send({ origin: config.SERVER, payload: 'Propiedades no permitidas', allowedFields });
+        if (!allOk) {
+            return res.status(400).json({ message: 'Propiedades no permitidas', allowedFields });
+        }
         next();
     };
 };
 
 export const verifyMongoDBId = (id) => {
     return (req, res, next) => {
-        if (!config.MONGODB_ID_REGEX.test(req.params[id])) 
-            return res.status(400).send({ origin: config.SERVER, payload: null, error: 'Id no valido' });
+        if (!config.MONGODB_ID_REGEX.test(req.params[id])) {
+            return res.status(400).json({ message: 'ID de MongoDB no válido' });
+        }
         next();
     };
 };
@@ -62,11 +67,20 @@ export const verifyDbConn = (req, res, next) => {
     next();
 };
 
-export const handlePolicies = policies => {
-    return async (req, res, next) => {
+export const handlePolicies = (policies) => {
+    return (req, res, next) => {
         if (!policies.includes(req.user.role)) {
-            return res.status(403).send({ origin: config.SERVER, payload: 'No autorizado' });
+            return res.status(403).json({ message: 'No autorizado' });
         }
         next();
     };
+};
+
+export const isAdmin = (req, res, next) => {
+    const user = req.user; 
+    if (user && user.role === 'admin') {
+        next();  
+    } else {
+        return res.status(403).json({ message: 'No autorizado' });
+    }
 };

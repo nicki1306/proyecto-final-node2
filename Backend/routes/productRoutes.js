@@ -1,12 +1,13 @@
 import express from 'express';
 import Compression from 'compression';
 import { getProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductsByCategory } from '../controllers/ProductController.js';
+import { isAdmin, verifyToken } from '../services/utils.js';
 
 const router = express.Router();
 
 router.use(Compression({ brotli: { enabled: true }, gzip: { enabled: true } }));
 
-// Ruta para obtener todos los productos
+// Ruta para obtener todos los productos (accesible para todos)
 router.get('/', async (req, res) => {
     try {
         const products = await getProducts();
@@ -17,7 +18,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Ruta para obtener un producto por ID
+// Ruta para obtener un producto por ID (accesible para todos)
 router.get('/products/:id', async (req, res) => {
     try {
         const product = await getProductById(req.params.id);
@@ -28,8 +29,8 @@ router.get('/products/:id', async (req, res) => {
     }
 });
 
-// Ruta para crear un nuevo producto
-router.post('/', async (req, res) => {
+// Ruta para crear un nuevo producto (solo para administradores)
+router.post('/', verifyToken, isAdmin, async (req, res) => {
     try {
         const savedProduct = await createProduct(req.body);
         res.status(201).json(savedProduct); 
@@ -39,7 +40,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Ruta para obtener productos por categoría
+// Ruta para obtener productos por categoría (accesible para todos)
 router.get('/category/:category', async (req, res) => {
     try {
         const products = await getProductsByCategory(req.params.category);
@@ -50,8 +51,8 @@ router.get('/category/:category', async (req, res) => {
     }
 });
 
-// Ruta para actualizar un producto
-router.put('/:id', async (req, res) => {
+// Ruta para actualizar un producto (solo para administradores)
+router.put('/:id', verifyToken, isAdmin, async (req, res) => {
     try {
         const updatedProduct = await updateProduct(req.params.id, req.body);
         res.status(200).json(updatedProduct);
@@ -61,8 +62,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Ruta para eliminar un producto
-router.delete('/products/:id', async (req, res) => {
+// Ruta para eliminar un producto (solo para administradores)
+router.delete('/products/:id', verifyToken, isAdmin, async (req, res) => {
     try {
         const deletedProduct = await deleteProduct(req.params.id);
         res.status(200).json(deletedProduct);
@@ -72,5 +73,9 @@ router.delete('/products/:id', async (req, res) => {
     }
 });
 
-export default router;
+// Ruta de prueba para verificar si el usuario es admin
+router.get('/admin', verifyToken, isAdmin, (req, res) => { 
+    res.status(200).json({ message: 'Soy un administrador' });
+});
 
+export default router;
