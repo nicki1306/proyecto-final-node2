@@ -7,16 +7,9 @@ const router = express.Router();
 
 router.use(Compression({ brotli: { enabled: true }, gzip: { enabled: true } }));
 
-// Ruta para obtener todos los productos (accesible para todos)
-router.get('/', async (req, res) => {
-    try {
-        const products = await getProducts();
-        res.status(200).json(products);
-    } catch (error) {
-        console.error('Error fetching products:', error.message);
-        res.status(500).json({ error: error.message });
-    }
-});
+// Ruta para obtener todos los productos
+router.get('/', getProducts);
+
 
 // Ruta para obtener un producto por ID (accesible para todos)
 router.get('/products/:id', async (req, res) => {
@@ -40,16 +33,9 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
     }
 });
 
-// Ruta para obtener productos por categoría (accesible para todos)
-router.get('/category/:category', async (req, res) => {
-    try {
-        const products = await getProductsByCategory(req.params.category);
-        res.status(200).json(products);
-    } catch (error) {
-        console.error('Error fetching products by category:', error.message);
-        res.status(500).json({ error: error.message });
-    }
-});
+// Ruta para obtener productos por categoría
+router.get('/category/:category', getProductsByCategory);
+
 
 // Ruta para actualizar un producto (solo para administradores)
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {

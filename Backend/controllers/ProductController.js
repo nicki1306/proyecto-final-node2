@@ -1,7 +1,7 @@
 import Product from '../models/ProductModel.js';
+import User from '../models/UserModel.js'; // Asegúrate de tener el modelo de User.
 import MongoSingleton from '../services/Mongosingleton.js';
 import nodemailer from 'nodemailer';
-
 
 const transport = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
@@ -13,89 +13,120 @@ const transport = nodemailer.createTransport({
 });
 
 // Obtener todos los productos
-export const getProducts = async () => {
+export const getProducts = async (req, res) => {
     try {
         await MongoSingleton.getInstance();
-        const products = await Product.find();
+        const products = await Product.find({}, {
+            _id: 1,
+            toy_name: 1,
+            manufacturer: 1,
+            age_group: 1,
+            price: 1,
+            material: 1,
+            color: 1,
+            description: 1,
+            image: 1,
+            category: 1
+        });
+
         if (!products || products.length === 0) {
-            throw new Error('No se encontraron productos');
+            return res.status(404).json({ message: 'No se encontraron productos' });
         }
-        return products;
+
+        products.forEach(product => console.log("Producto ID: ", product._id));
+        res.status(200).json(products);
+        
     } catch (error) {
-        throw new Error('Error al obtener los productos');
+        res.status(500).json({ message: 'Error al obtener los productos', error: error.message });
     }
 };
 
 // Obtener un producto por ID
-export const getProductById = async (productId) => {
+export const getProductById = async (req, res) => {
+    const { productId } = req.params;
     try {
         await MongoSingleton.getInstance();
         const product = await Product.findById(productId);
         if (!product) {
-            throw new Error('No se encontró el producto');
+            return res.status(404).json({ message: 'Producto no encontrado' });
         }
-        return product;
+        res.status(200).json(product);
     } catch (error) {
-        throw new Error('Error al obtener el producto');
+        res.status(500).json({ message: 'Error al obtener el producto', error: error.message });
     }
 };
 
 // Actualizar un producto
-export const updateProduct = async (productId, productData) => {
+export const updateProduct = async (req, res) => {
+    const { productId } = req.params;
+    const productData = req.body;
+
     try {
         await MongoSingleton.getInstance();
         const updatedProduct = await Product.findByIdAndUpdate(productId, productData, { new: true });
         if (!updatedProduct) {
-            throw new Error('No se encontró el producto');
+            return res.status(404).json({ message: 'Producto no encontrado' });
         }
-        return updatedProduct;
+        res.status(200).json(updatedProduct);
     } catch (error) {
-        throw new Error('Error al actualizar el producto');
+        res.status(500).json({ message: 'Error al actualizar el producto', error: error.message });
     }
 };
 
 // Crear un nuevo producto
-export const createProduct = async (productData) => {
+export const createProduct = async (req, res) => {
+    const productData = req.body;
     try {
-        const product = new Product(productData);
-        const savedProduct = await product.save();
-        return savedProduct;
+        await MongoSingleton.getInstance();
+        const newProduct = new Product(productData);
+        const savedProduct = await newProduct.save();
+        res.status(201).json(savedProduct);
     } catch (error) {
-        throw new Error('Error al crear el producto');
+        res.status(500).json({ message: 'Error al crear el producto', error: error.message });
     }
 };
 
-// Obtener productos por categoría
-export const getProductsByCategory = async (category) => {
-    await MongoSingleton.getInstance();
-    
-    return await Product.find({ category });
-};
-
 // Eliminar un producto
-export const deleteProduct = async (productId) => {
+export const deleteProduct = async (req, res) => {
+    const { productId } = req.params;
     try {
         await MongoSingleton.getInstance();
         const deletedProduct = await Product.findByIdAndDelete(productId);
         if (!deletedProduct) {
-            throw new Error('No se encontró el producto');
+            return res.status(404).json({ message: 'Producto no encontrado' });
         }
 
-    const user = await user.findById(deleteProduct.userId);
+        const user = await User.findById(deletedProduct.userId);
         if (user && user.role === 'premium') {
-
             const mailOptions = {
                 from: 'tuemail@gmail.com',
                 to: user.email,
                 subject: 'Producto eliminado',
-                text: `Estimado/a ${user.first_name}, su producto "${deleteProduct.toy_name}" ha sido eliminado.`
+                text: `Estimado/a ${user.first_name}, su producto "${deletedProduct.toy_name}" ha sido eliminado.`
             };
 
             await transport.sendMail(mailOptions);
         }
 
-        return deleteProduct; 
+        res.status(200).json({ message: 'Producto eliminado correctamente', product: deletedProduct });
     } catch (error) {
-        throw new Error('Error al eliminar el producto'); 
+        res.status(500).json({ message: `Error al eliminar el producto: ${error.message}` });
     }
 };
+
+export const getProductsByCategory = async (req, res) => {
+    try {
+        await MongoSingleton.getInstance();
+        const { category } = req.params;
+        const products = await Product.find({ category });
+
+        if (!products || products.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron productos en esta categoría' });
+        }
+
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener productos por categoría', error: error.message });
+    }
+};
+

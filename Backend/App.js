@@ -24,6 +24,7 @@ import errorsHandler from './services/error.handler.js';
 import TestRouter from './routes/test.routes.js';
 import productRouter from './routes/productRoutes.js';
 import cartRouter from './routes/CartRoutes.js';
+import orderRoutes from './routes/orderroutes.js';
 import userRouter from './routes/userRoutes.js';
 import AuthRouter from './routes/AuthRoutes.js';
 import addLogger from './services/logger.js';
@@ -145,6 +146,7 @@ if (cluster.isPrimary) {
 
     app.use('/api/upload', uploadRouter);
     app.use('/api/products', productRouter);
+    app.use('/api/orders', orderRoutes);
     app.use('/api/business', businessRouter);
     app.use('/api/cart', cartRouter);
     app.use('/api/user', userRouter);
