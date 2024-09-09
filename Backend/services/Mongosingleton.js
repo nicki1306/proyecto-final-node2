@@ -17,10 +17,21 @@ class MongoSingleton {
     async connect() {
         try {
             await mongoose.connect(config.MONGO_URI, {
-                serverSelectionTimeoutMS: 5000, 
+                serverSelectionTimeoutMS: 10000, 
                 socketTimeoutMS: 4500,
             });
-            console.log('MongoDB conectado', config.MONGO_URI);
+            mongoose.connection.on('connected', () => {
+                console.log('MongoDB conectado correctamente');
+            });
+
+            mongoose.connection.on('disconnected', () => {
+                console.log('MongoDB se ha desconectado');
+            });
+
+            mongoose.connection.on('error', (err) => {
+                console.error('Error en la conexión de MongoDB:', err);
+            });
+
         } catch (error) {
             console.error('Error de conexión a MongoDB:', error);
             process.exit(1);

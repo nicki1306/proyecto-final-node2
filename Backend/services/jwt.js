@@ -6,8 +6,9 @@ export const generateToken = (user) => {
         email: user.email,
         role: user.role
     };
-    const secret = process.env.JWT_SECRET || 'mysecret';
-    return jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, {
-        expiresIn: '1h'
-});
+    
+    const secret = process.env.JWT_SECRET || 'mysecret'; 
+    return jwt.sign(payload, secret, {
+        expiresIn: '1h' 
+    });
 };

@@ -6,7 +6,7 @@ import { verifyRequiredBody, verifyAllowedBody, verifyMongoDBId } from '../servi
 const router = Router();
 const controller = new Controller();
 
-router.param('id', verifyMongoDBId());
+router.param('id', verifyMongoDBId);
 
 router.get('/', async (req, res) => {
     try {

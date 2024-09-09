@@ -9,20 +9,22 @@ export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSy
 
 export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareSync(passwordToVerify, storedHash);
 
-export const generateToken = (payload) => jwt.sign(payload, config.SECRET, { expiresIn: '1h' });
+export const generateToken = (payload) => {
+    return jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
+};
 
 export const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1]; // Asegúrate de que el token viene correctamente
+    const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
         return res.status(403).json({ message: 'Token no proporcionado' });
     }
 
-    jwt.verify(token, config.SECRET, (err, decoded) => { // Usar config.SECRET para consistencia
+    jwt.verify(token, config.SECRET, (err, decoded) => {
         if (err) {
             return res.status(403).json({ message: 'Token inválido o expirado' });
         }
 
-        req.user = decoded; // Añadir el payload decodificado a req.user
+        req.user = decoded;
         next();
     });
 };
@@ -52,29 +54,34 @@ export const verifyAllowedBody = (allowedFields) => {
         next();
     };
 };
+import mongoose from 'mongoose';
 
-export const verifyMongoDBId = (id) => {
-    return (req, res, next) => {
-        if (!config.MONGODB_ID_REGEX.test(req.params[id])) {
-            return res.status(400).json({ message: 'ID de MongoDB no válido' });
-        }
-        next();
-    };
+export const verifyMongoDBId = (req, res, next) => {
+    const { id } = req.params; 
+    if (!id) {
+        return res.status(400).json({ message: 'ID no proporcionado en la ruta' }); 
+    }
+    if (!mongoose.Types.ObjectId.isValid(id)) { 
+        return res.status(400).json({ message: 'ID de MongoDB no válido' });
+    }
+    next();
 };
+
 
 export const verifyDbConn = (req, res, next) => {
     MongoSingleton.getInstance();
     next();
 };
 
-export const handlePolicies = (policies) => {
+export const handlePolicies = (allowedRoles) => {
     return (req, res, next) => {
-        if (!policies.includes(req.user.role)) {
+        if (!req.user || !allowedRoles.includes(req.user.role)) {
             return res.status(403).json({ message: 'No autorizado' });
         }
         next();
     };
 };
+
 
 export const isAdmin = (req, res, next) => {
     const user = req.user; 

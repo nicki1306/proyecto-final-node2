@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { uploader } from './uploader.js';
 import pkg from 'cloudinary';
-const { v2: cloudinary } = pkg;
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -26,7 +25,6 @@ import productRouter from './routes/productRoutes.js';
 import cartRouter from './routes/CartRoutes.js';
 import orderRoutes from './routes/orderroutes.js';
 import userRouter from './routes/userRoutes.js';
-import AuthRouter from './routes/AuthRoutes.js';
 import addLogger from './services/logger.js';
 import cookiesRouter from './routes/cookies.routes.js';
 
@@ -150,7 +148,6 @@ if (cluster.isPrimary) {
     app.use('/api/business', businessRouter);
     app.use('/api/cart', cartRouter);
     app.use('/api/user', userRouter);
-    app.use('/api/auth', AuthRouter);
     app.use('/api/test', TestRouter);
     app.use('/api/cookies', cookiesRouter);
 

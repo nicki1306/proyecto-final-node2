@@ -4,36 +4,29 @@ const service = new BusinessService();
 
 class businessDTO {
     constructor(data) {
-        this.data = data;
-
-        this.data.id = 1;
-        this.data.products = [
-            { id: 1, name: 'Medialuna x 12', price: 5000 },
-            { id: 2, name: 'Bizcocho dulce x 12', price: 3000 },
-            { id: 3, name: 'Pan francés x kg', price: 6000 }
-        ];
+        this.id = data.id || null;
+        this.name = data.name || '';
+        this.products = data.products || [];
     }
 }
 
 class BusinessController {
-    constructor() {
-    }
+    constructor() {}
 
     async get(id) {
         try {
-            return id === undefined || id === null ? service.get(): await service.getOne(id);
+            return id ? await service.getOne(id) : await service.get();
         } catch (err) {
-            return err.message
+            throw new Error(`Error al obtener datos: ${err.message}`);
         }
-        
     }
 
     async add(data) {
         try {
             const normalized = new businessDTO(data);
-            return await service.add(normalized.data);
+            return await service.add(normalized);
         } catch (err) {
-            return err.message
+            throw new Error(`Error al agregar negocio: ${err.message}`);
         }
     }
 
@@ -41,7 +34,7 @@ class BusinessController {
         try {
             return await service.update(id, data);
         } catch (err) {
-            return err.message
+            throw new Error(`Error al actualizar negocio: ${err.message}`);
         }
     }
 
@@ -49,7 +42,7 @@ class BusinessController {
         try {
             return await service.delete(id);
         } catch (err) {
-            return err.message
+            throw new Error(`Error al eliminar negocio: ${err.message}`);
         }
     }
 }

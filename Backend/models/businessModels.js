@@ -5,13 +5,26 @@ mongoose.pluralize(null);
 
 const collection = 'businesses';
 
-const schema = new mongoose.Schema({
-    name: { type: String },
-    products: []
-});
+const productSchema = new mongoose.Schema({
+    name: { type: String, required: true }, 
+    price: { type: Number, required: true }, 
+    quantity: { type: Number, default: 1 } 
+}, { _id: false });  
 
-schema.plugin(mongoosePaginate);
+const businessSchema = new mongoose.Schema({
+    name: { 
+        type: String, 
+        required: [true, 'El nombre del negocio es obligatorio'],  
+        trim: true 
+    },
+    products: {
+        type: [productSchema],  
+        validate: [products => products.length > 0, 'Debe haber al menos un producto']  
+    }
+}, { timestamps: true });  
 
-const model = mongoose.model(collection, schema);
+businessSchema.plugin(mongoosePaginate);
 
-export default model;
+const BusinessModel = mongoose.model(collection, businessSchema);
+
+export default BusinessModel;
