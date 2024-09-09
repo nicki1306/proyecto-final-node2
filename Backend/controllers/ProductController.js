@@ -43,10 +43,10 @@ export const getProducts = async (req, res) => {
 
 // Obtener un producto por ID
 export const getProductById = async (req, res) => {
-    const { productId } = req.params;
+    const { id } = req.params;
     try {
         await MongoSingleton.getInstance();
-        const product = await Product.findById(productId);
+        const product = await Product.findById(id);
         if (!product) {
             return res.status(404).json({ message: 'Producto no encontrado' });
         }

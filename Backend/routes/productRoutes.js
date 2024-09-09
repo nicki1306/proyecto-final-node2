@@ -7,22 +7,11 @@ const router = express.Router();
 
 router.use(Compression({ brotli: { enabled: true }, gzip: { enabled: true } }));
 
-// Ruta para obtener todos los productos
 router.get('/', getProducts);
 
+router.get('/:id', getProductById);
 
-// Ruta para obtener un producto por ID (accesible para todos)
-router.get('/products/:id', async (req, res) => {
-    try {
-        const product = await getProductById(req.params.id);
-        res.status(200).json(product);
-    } catch (error) {
-        console.error('Error fetching product by ID:', error.message);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Ruta para crear un nuevo producto (solo para administradores)
+// Crear un nuevo producto (solo para administradores)
 router.post('/', verifyToken, isAdmin, async (req, res) => {
     try {
         const savedProduct = await createProduct(req.body);
@@ -33,11 +22,10 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
     }
 });
 
-// Ruta para obtener productos por categoría
+// Obtener productos por categoría
 router.get('/category/:category', getProductsByCategory);
 
-
-// Ruta para actualizar un producto (solo para administradores)
+// Actualizar un producto (solo para administradores)
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
     try {
         const updatedProduct = await updateProduct(req.params.id, req.body);
@@ -48,8 +36,8 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
     }
 });
 
-// Ruta para eliminar un producto (solo para administradores)
-router.delete('/products/:id', verifyToken, isAdmin, async (req, res) => {
+// Eliminar un producto (solo para administradores)
+router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
     try {
         const deletedProduct = await deleteProduct(req.params.id);
         res.status(200).json(deletedProduct);
