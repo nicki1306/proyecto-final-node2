@@ -1,57 +1,30 @@
 import mongoose from 'mongoose';
-import config from '../config.js';
+import dotenv from 'dotenv';
 
-
-mongoose.pluralize(null);
-
+dotenv.config();
 
 class MongoSingleton {
-    constructor() {
-        if (MongoSingleton.instance) {
-            return MongoSingleton.instance;
-        }
-        this.connect();
-        MongoSingleton.instance = this;
-    }
+    static instance;
 
-    async connect() {
-        try {
-            await mongoose.connect(config.MONGO_URI, {
-                serverSelectionTimeoutMS: 10000, 
-                socketTimeoutMS: 4500,
-            });
-            mongoose.connection.on('connected', () => {
-                console.log('MongoDB conectado correctamente');
-            });
-
-            mongoose.connection.on('disconnected', () => {
-                console.log('MongoDB se ha desconectado');
-            });
-
-            mongoose.connection.on('error', (err) => {
-                console.error('Error en la conexión de MongoDB:', err);
-            });
-
-        } catch (error) {
-            console.error('Error de conexión a MongoDB:', error);
-            process.exit(1);
-        }
-    }
-
-    async disconnect() {
-        if (mongoose.connection.readyState === 1) {
-            await mongoose.disconnect();
-            console.log('MongoDB desconectado');
-        }
-    }
-
-    static getInstance() {
+    static async getInstance() {
         if (!MongoSingleton.instance) {
-            MongoSingleton.instance = new MongoSingleton();
+            try {
+                console.log('Intentando conectar a MongoDB...');
+                MongoSingleton.instance = await mongoose.connect(process.env.MONGO_URI, {
+                    //useNewUrlParser: true,
+                    //useUnifiedTopology: true,
+                    serverSelectionTimeoutMS: 10000,
+                });
+                console.log('MongoDB conectado exitosamente');
+            } catch (error) {
+                console.error('Error al conectar a MongoDB:', error);
+                throw error;
+            }
+        } else {
+            console.log('Instancia de MongoSingleton ya existe');
         }
         return MongoSingleton.instance;
     }
 }
 
 export default MongoSingleton;
-
