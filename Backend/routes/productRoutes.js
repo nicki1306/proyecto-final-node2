@@ -1,6 +1,7 @@
 import express from 'express';
 import Compression from 'compression';
 import { getProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductsByCategory } from '../controllers/ProductController.js';
+import ProductModel from '../models/ProductModel.js';
 import { isAdmin, verifyToken } from '../services/utils.js';
 
 const router = express.Router();
@@ -11,7 +12,24 @@ router.get('/', getProducts);
 
 router.get('/:id', getProductById);
 
-// Crear un nuevo producto (solo para administradores)
+
+router.get('/category/:category', getProductsByCategory);
+
+router.get('/search', async (req, res) => {
+    const query = req.query.query; 
+    try {
+        if (!query) {
+            return res.status(400).json({ message: 'Search query is required' });
+        }
+        const products = await products.find({ toy_name: new RegExp(query, 'i') }); 
+        res.json({ products });
+    } catch (error) {
+        console.error('Error fetching search results:', error);
+        res.status(500).json({ message: 'Error fetching search results' });
+    }
+});
+
+// Crear un nuevo producto (solo para admin)
 router.post('/', verifyToken, isAdmin, async (req, res) => {
     try {
         const savedProduct = await createProduct(req.body);
@@ -22,10 +40,7 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
     }
 });
 
-// Obtener productos por categoría
-router.get('/category/:category', getProductsByCategory);
-
-// Actualizar un producto (solo para administradores)
+// Actualizar un producto (solo para admin)
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
     try {
         const updatedProduct = await updateProduct(req.params.id, req.body);
@@ -36,7 +51,7 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
     }
 });
 
-// Eliminar un producto (solo para administradores)
+// Eliminar un producto (solo para admin)
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
     try {
         const deletedProduct = await deleteProduct(req.params.id);

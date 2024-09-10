@@ -9,7 +9,13 @@ export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSy
 
 export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareSync(passwordToVerify, storedHash);
 
-export const generateToken = (payload) => {
+export const generateToken = (user) => {
+    const payload = {
+        id: user._id.toString(),
+        email: user.email,
+        role: user.role
+    };
+    //const secret = process.env.JWT_SECRET || 'mysecret';
     return jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
 };
 

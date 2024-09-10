@@ -5,22 +5,39 @@ import { generateToken } from '../services/utils.js';
 
 export const registerUser = async (req, res) => {
     const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+
     try {
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'El usuario ya existe' });
+        }
+
+        // Encriptar la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             name,
             email,
-            password: hashedPassword, 
+            password: hashedPassword,
             role: role || 'user',
         });
 
         const savedUser = await newUser.save();
-        const token = generateToken(savedUser);
+
+        const token = generateToken({
+            _id: savedUser._id,
+            email: savedUser.email,
+            role: savedUser.role,
+        });
 
         res.status(201).json({ token, user: savedUser });
     } catch (error) {
         console.error('Error al registrar usuario:', error);
-        res.status(500).json({ error: 'Error registrando usuario' });
+        res.status(500).json({ error: 'Error interno en el servidor', details: error.message });
     }
 };
 
@@ -47,6 +64,6 @@ export const loginUser = async (req, res) => {
         res.status(200).json({ user, token });
     } catch (error) {
         console.error('Error during login:', error);
-        res.status(500).json({ message: 'Error during login' });
+        res.status(500).json({ error: 'Error interno en el servidor', details: error.message });
     }
 };
