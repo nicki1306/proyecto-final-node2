@@ -10,14 +10,19 @@ export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSy
 export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareSync(passwordToVerify, storedHash);
 
 export const generateToken = (user) => {
+    if (!user._id) {
+        throw new Error('El usuario no tiene un _id válido');
+    }
+
     const payload = {
         id: user._id.toString(),
         email: user.email,
         role: user.role
     };
-    //const secret = process.env.JWT_SECRET || 'mysecret';
+
     return jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
 };
+
 
 export const verifyToken = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];

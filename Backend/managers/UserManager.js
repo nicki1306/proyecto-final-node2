@@ -12,8 +12,7 @@ class UserManager {
             throw new Error('User already exists');
         }
 
-        // Encriptar la contraseña
-        const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+        const hashedPassword = await bcrypt.hash(password.trim(), bcrypt.genSaltSync(10));
 
         const newUser = new User({
             name,
@@ -31,16 +30,23 @@ class UserManager {
         const user = await User.findOne({ email });
         console.log('user', user);
 
-        if (!user) {
-            throw new Error('Invalid email or password');
+        if (!user || !user._id)  {
+            throw new Error('Usuario no encontrado o no tiene _id válido');
         }
 
-        const isMatch = bcrypt.compareSync(password, user.password);
+        const trimmedPassword = password.trim();
+        const isMatch = await bcrypt.compare(trimmedPassword, user.password);
+
+
+        console.log('Contraseña en texto plano:', password);
+        console.log('Hash almacenado:', user.password);
+        console.log('¿Contraseña coincide?', isMatch);
+
         if (!isMatch) {
             throw new Error('Invalid email or password');
         }
 
-        const token = generateToken({ id: user._id, role: user.role });
+        const token = generateToken(user);
         return { user, token };
     }
 }

@@ -26,7 +26,8 @@ export const registerUser = async (req, res) => {
     }
 };
 
-//  iniciar sesión
+// iniciar sesion
+
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -35,28 +36,19 @@ export const loginUser = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ message: 'Email o contraseña inválidos' });
-        }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Email o contraseña inválidos' });
-        }
+        const { user, token } = await UserManager.authenticateUser(email, password);
 
         user.last_login = Date.now();
         await user.save();
 
-        const token = generateToken({
-            _id: user._id,
-            email: user.email,
-            role: user.role,
-        });
-
         res.status(200).json({ user, token });
     } catch (error) {
-        console.error('Error durante el inicio de sesión:', error);
+
+        console.error('Error durante el inicio de sesión:', error.message);
+        if (error.message === 'Invalid email or password') {
+            return res.status(401).json({ message: 'Email o contraseña inválidos' });
+        }
         res.status(500).json({ error: 'Error interno en el servidor', details: error.message });
     }
 };
