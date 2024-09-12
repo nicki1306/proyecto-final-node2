@@ -10,12 +10,12 @@ export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSy
 export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareSync(passwordToVerify, storedHash);
 
 export const generateToken = (user) => {
-    if (!user._id) {
+    if (!user.userId) {
         throw new Error('El usuario no tiene un _id válido');
     }
 
     const payload = {
-        id: user._id.toString(),
+        userId: user.userId,
         email: user.email,
         role: user.role
     };
@@ -30,7 +30,7 @@ export const verifyToken = (req, res, next) => {
         return res.status(403).json({ message: 'Token no proporcionado' });
     }
 
-    jwt.verify(token, config.SECRET, (err, decoded) => {
+    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
         if (err) {
             return res.status(403).json({ message: 'Token inválido o expirado' });
         }

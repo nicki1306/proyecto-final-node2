@@ -9,7 +9,7 @@ class UserManager {
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            throw new Error('User already exists');
+            throw new Error('El usuario ya existe');
         }
 
         const hashedPassword = await bcrypt.hash(password.trim(), bcrypt.genSaltSync(10));
@@ -35,6 +35,7 @@ class UserManager {
         }
 
         const trimmedPassword = password.trim();
+
         const isMatch = await bcrypt.compare(trimmedPassword, user.password);
 
 
@@ -46,7 +47,7 @@ class UserManager {
             throw new Error('Invalid email or password');
         }
 
-        const token = generateToken(user);
+        const token = generateToken({ userId: user._id.toString(), role: user.role });
         return { user, token };
     }
 }

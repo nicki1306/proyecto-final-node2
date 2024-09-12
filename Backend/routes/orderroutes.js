@@ -1,9 +1,12 @@
 import express from 'express';
-import { createOrder } from '../controllers/OrderController.js';
+import { createOrder, getOrdersByUser } from '../controllers/OrderController.js';
+import { verifyToken, handlePolicies } from '../services/utils.js';
 
 const router = express.Router();
 
 // Ruta para crear una nueva orden
-router.post('/', createOrder);
+router.post('/orders', verifyToken, handlePolicies(['user', 'admin']), createOrder);
+
+router.get('/user-orders', verifyToken, getOrdersByUser);
 
 export default router;
