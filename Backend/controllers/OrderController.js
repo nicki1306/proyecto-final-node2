@@ -11,6 +11,8 @@ export const createOrder = async (req, res) => {
         const { name, address, paymentMethod, items, total } = req.body;
         console.log('Datos de la orden:', { name, address, paymentMethod, items, total });
 
+        const userId = req.user.userId; 
+
         const userEmail = req.user?.email;
 
         if (!name || !userEmail || !address || !paymentMethod || items.length === 0 || !total) {
@@ -24,6 +26,7 @@ export const createOrder = async (req, res) => {
         }
 
         const newOrder = new Order({
+            userId,
             name,
             email: req.user.email,
             address,
