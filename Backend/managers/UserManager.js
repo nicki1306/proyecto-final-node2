@@ -47,7 +47,11 @@ class UserManager {
             throw new Error('Invalid email or password');
         }
 
-        const token = generateToken({ userId: user._id.toString(), role: user.role });
+        const token = generateToken({ 
+            _id: user._id,
+            email: user.email,
+            role: user.role 
+        });
         return { user, token };
     }
 }

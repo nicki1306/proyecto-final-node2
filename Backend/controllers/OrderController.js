@@ -3,9 +3,15 @@ import mongoose from 'mongoose';
 
 export const createOrder = async (req, res) => {
     try {
-        const { name, address, paymentMethod, items, total } = req.body;
+        console.log('Cuerpo de la solicitud:', req.body);
+        console.log('Token recibido en el backend:', req.headers.authorization);
 
-        const userEmail = req.user.email;
+        console.log('Usuario autenticado:', req.user);
+
+        const { name, address, paymentMethod, items, total } = req.body;
+        console.log('Datos de la orden:', { name, address, paymentMethod, items, total });
+
+        const userEmail = req.user?.email;
 
         if (!name || !userEmail || !address || !paymentMethod || items.length === 0 || !total) {
             return res.status(400).json({ message: 'Faltan datos para completar la orden.' });
@@ -19,7 +25,7 @@ export const createOrder = async (req, res) => {
 
         const newOrder = new Order({
             name,
-            email: userEmail,
+            email: req.user.email,
             address,
             paymentMethod,
             items,

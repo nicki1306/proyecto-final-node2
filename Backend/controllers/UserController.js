@@ -13,6 +13,12 @@ export const registerUser = async (req, res) => {
 
     try {
         const existingUser = await UserManager.registerUser({ name, email, password, role });
+
+        console.log('Usuario registrado:', existingUser);
+        if (!existingUser._id) {
+            throw new Error('El _id del usuario no se generó correctamente');
+        }
+
         const token = generateToken({
             _id: existingUser._id,
             email: existingUser.email,
@@ -38,6 +44,12 @@ export const loginUser = async (req, res) => {
     try {
 
         const { user, token } = await UserManager.authenticateUser(email, password);
+
+        console.log('Usuario autenticado:', user);
+        if (!user._id) {
+            throw new Error('El _id del usuario no se generó correctamente');
+        }
+
 
         user.last_login = Date.now();
         await user.save();

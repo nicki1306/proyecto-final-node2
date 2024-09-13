@@ -5,7 +5,7 @@ import { verifyToken, handlePolicies } from '../services/utils.js';
 const router = express.Router();
 
 // Ruta para crear una nueva orden
-router.post('/orders', verifyToken, handlePolicies(['user', 'admin']), createOrder);
+router.post('/', verifyToken, createOrder);
 
 router.get('/user-orders', verifyToken, getOrdersByUser);
 

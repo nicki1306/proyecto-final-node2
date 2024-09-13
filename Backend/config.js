@@ -11,6 +11,7 @@ commandLine.parse();
 const clOptions = commandLine.opts();
 
 dotenv.config({ path: clOptions.server === 'prod' ? '.env.prod': '.env.dev' });
+console.log("Variables de entorno cargadas:", process.env.JWT_SECRET); 
 
 const config = {
     APP_NAME: 'Proyecto Node',
@@ -25,10 +26,11 @@ const config = {
     SECRET: process.env.SECRET,
     JWT_SECRET: process.env.JWT_SECRET,
 
+
     // Variables de entorno
     DIRNAME: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')),
     get BASEDIR() { return this.DIRNAME.slice(0, -4) },
-    get UPLOAD_DIR() { return `${this.DIRNAME}/uploads` },
+    get UPLOAD_DIR() { return `${this.BASEDIR}/public/images` },
 
     // Variables de Cloudinary
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
@@ -50,9 +52,6 @@ const config = {
     TWILO_SID: process.env.TWILIO_ACCOUNT_SID,
     TWILO_TOKEN: process.env.TWILIO_AUTH_TOKEN,
     TWILO_PHONE: process.env.TWILIO_PHONE,
-
-    get BASEDIR() { return this.DIRNAME.slice(0, -6) },
-    get UPLOAD_DIR() { return `${this.DIRNAME}/public/images` },
 
 };
 

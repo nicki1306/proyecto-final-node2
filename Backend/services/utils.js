@@ -2,25 +2,26 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from '../config.js';
 import MongoSingleton from './Mongosingleton.js';
-import CustomError from './CustomError.js';
-import { errorDictionary } from '../config.js';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
 export const isValidPassword = (passwordToVerify, storedHash) => bcrypt.compareSync(passwordToVerify, storedHash);
 
 export const generateToken = (user) => {
-    if (!user.userId) {
+    if (!user._id) {
+        console.error("El usuario no tiene un _id válido:", user);
         throw new Error('El usuario no tiene un _id válido');
     }
 
+    console.log("Tipo de _id:", typeof user._id);
+
     const payload = {
-        userId: user.userId,
+        userId: user._id.toString(),
         email: user.email,
         role: user.role
     };
-
-    return jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
+    console.log("JWT_SECRET utilizado para generar el token:", process.env.JWT_SECRET);
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
 
@@ -30,14 +31,20 @@ export const verifyToken = (req, res, next) => {
         return res.status(403).json({ message: 'Token no proporcionado' });
     }
 
-    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
+    console.log("JWT_SECRET utilizado para verificar el token:", process.env.JWT_SECRET);
+    console.log("Token recibido en la solicitud:", token);
+
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
+            console.error('Error al verificar el token:', err);
             return res.status(403).json({ message: 'Token inválido o expirado' });
         }
-
+        console.log('Token decodificado correctamente:', decoded); 
         req.user = decoded;
         next();
     });
+    
 };
 
 export const verifyRequiredBody = (requiredFields) => {
