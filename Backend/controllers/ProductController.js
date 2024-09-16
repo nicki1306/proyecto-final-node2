@@ -12,7 +12,7 @@ const transport = nodemailer.createTransport({
     }
 });
 
-// Obtener todos los productos
+// Obtener todos los productos 
 export const getProducts = async (req, res) => {
     try {
         await MongoSingleton.getInstance();
@@ -26,22 +26,21 @@ export const getProducts = async (req, res) => {
             color: 1,
             description: 1,
             image: 1,
-            category: 1
+            category: 1,
+            stock: 1,  
         });
 
         if (!products || products.length === 0) {
             return res.status(404).json({ message: 'No se encontraron productos' });
         }
 
-        products.forEach(product => console.log("Producto ID: ", product._id));
         res.status(200).json(products);
-        
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los productos', error: error.message });
     }
 };
 
-// Obtener un producto por ID
+// Obtener un producto por ID 
 export const getProductById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -56,7 +55,7 @@ export const getProductById = async (req, res) => {
     }
 };
 
-// Actualizar un producto
+// Actualizar un producto 
 export const updateProduct = async (req, res) => {
     const { productId } = req.params;
     const productData = req.body;
@@ -75,10 +74,10 @@ export const updateProduct = async (req, res) => {
 
 // Crear un nuevo producto
 export const createProduct = async (req, res) => {
-    const productData = req.body;
+    const { toy_name, manufacturer, age_group, price, material, color, description, category, imageUrl, stock } = req.body;
     try {
         await MongoSingleton.getInstance();
-        const newProduct = new Product(productData);
+        const newProduct = new Product({ toy_name, manufacturer, age_group, price, material, color, description, category, imageUrl, stock });
         const savedProduct = await newProduct.save();
         res.status(201).json(savedProduct);
     } catch (error) {
@@ -114,6 +113,7 @@ export const deleteProduct = async (req, res) => {
     }
 };
 
+// Obtener productos por categoría
 export const getProductsByCategory = async (req, res) => {
     try {
         await MongoSingleton.getInstance();
@@ -130,6 +130,7 @@ export const getProductsByCategory = async (req, res) => {
     }
 };
 
+// Obtener productos en oferta
 export const getOnSaleProducts = async (req, res) => {
     try {
         await MongoSingleton.getInstance();
@@ -141,6 +142,7 @@ export const getOnSaleProducts = async (req, res) => {
     }
 };
 
+// Buscar productos por nombre
 export const searchProducts = async (req, res) => {
     const { query } = req.query;
     try {
@@ -151,5 +153,3 @@ export const searchProducts = async (req, res) => {
         res.status(500).json({ message: 'Error al buscar productos', error: error.message });
     }    
 };
-
-

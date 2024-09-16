@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     onSale: { type: Boolean, default: false },
     salePrice: { type: Number },
+    stock: { type: Number, required: true, default: 0 },
 });
 
 const Product = mongoose.model('Product', productSchema);
