@@ -1,33 +1,31 @@
 import express from 'express';
 import Compression from 'compression';
-import { getProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductsByCategory } from '../controllers/ProductController.js';
-import ProductModel from '../models/ProductModel.js';
+import { getProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductsByCategory, getOnSaleProducts, searchProducts } from '../controllers/ProductController.js';
 import { isAdmin, verifyToken } from '../services/utils.js';
 
 const router = express.Router();
 
 router.use(Compression({ brotli: { enabled: true }, gzip: { enabled: true } }));
 
+// Obtener los productos en oferta
+
+router.get('/category/ofertas', getOnSaleProducts);
+
+// Obtener todos los productos
+
 router.get('/', getProducts);
+
+// Obtener un producto por ID
 
 router.get('/:id', getProductById);
 
+// Obtener los productos por categoría
 
 router.get('/category/:category', getProductsByCategory);
 
-router.get('/search', async (req, res) => {
-    const query = req.query.query; 
-    try {
-        if (!query) {
-            return res.status(400).json({ message: 'Search query is required' });
-        }
-        const products = await products.find({ toy_name: new RegExp(query, 'i') }); 
-        res.json({ products });
-    } catch (error) {
-        console.error('Error fetching search results:', error);
-        res.status(500).json({ message: 'Error fetching search results' });
-    }
-});
+// Buscar un producto
+
+router.get('/search/:query', searchProducts);
 
 // Crear un nuevo producto (solo para admin)
 router.post('/', verifyToken, isAdmin, async (req, res) => {

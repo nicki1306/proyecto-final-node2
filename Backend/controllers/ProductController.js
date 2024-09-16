@@ -1,5 +1,5 @@
 import Product from '../models/ProductModel.js';
-import User from '../models/UserModel.js'; // Asegúrate de tener el modelo de User.
+import User from '../models/UserModel.js';
 import MongoSingleton from '../services/Mongosingleton.js';
 import nodemailer from 'nodemailer';
 
@@ -129,4 +129,27 @@ export const getProductsByCategory = async (req, res) => {
         res.status(500).json({ message: 'Error al obtener productos por categoría', error: error.message });
     }
 };
+
+export const getOnSaleProducts = async (req, res) => {
+    try {
+        await MongoSingleton.getInstance();
+        const onSaleProducts = await Product.find({ onSale: true });
+        res.status(200).json(onSaleProducts);
+    } catch (error) {
+        console.error('Error al obtener productos en oferta:', error);
+        res.status(500).json({ message: 'Error al obtener productos en oferta' });
+    }
+};
+
+export const searchProducts = async (req, res) => {
+    const { query } = req.query;
+    try {
+        await MongoSingleton.getInstance();
+        const products = await Product.find({ toy_name: new RegExp(query, 'i') });
+        res.status(200).json(products);
+    } catch (error) {    
+        res.status(500).json({ message: 'Error al buscar productos', error: error.message });
+    }    
+};
+
 
