@@ -7,12 +7,12 @@ const productSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     material: { type: String, required: true },
     color: { type: String, required: true },
-    imageUrl: { type: String, required: true },
-    description: { type: String, required: true },
+    imageUrl: { type: String,default: 'https://example.com/default-image.png' },
+    description: { type: String, default: 'Description not available' },
     category: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     onSale: { type: Boolean, default: false },
-    salePrice: { type: Number },
+    salePrice: { type: Number, default: 0 },
     stock: { type: Number, required: true, default: 0 },
 });
 

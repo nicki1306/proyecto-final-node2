@@ -1,30 +1,50 @@
 import Order from '../models/OrderModel.js';
+import Product from '../models/ProductModel.js'; 
 import mongoose from 'mongoose';
 
 export const createOrder = async (req, res) => {
+    const session = await mongoose.startSession(); 
+    session.startTransaction(); 
     try {
         console.log('Cuerpo de la solicitud:', req.body);
         console.log('Token recibido en el backend:', req.headers.authorization);
-
         console.log('Usuario autenticado:', req.user);
 
         const { name, address, paymentMethod, items, total } = req.body;
         console.log('Datos de la orden:', { name, address, paymentMethod, items, total });
 
-        const userId = req.user.userId; 
-
+        const userId = req.user.userId;
         const userEmail = req.user?.email;
 
         if (!name || !userEmail || !address || !paymentMethod || items.length === 0 || !total) {
             return res.status(400).json({ message: 'Faltan datos para completar la orden.' });
         }
 
+        // Verificar stock disponible
         for (let item of items) {
             if (!mongoose.isValidObjectId(item.productId)) {
                 return res.status(400).json({ message: `El productId ${item.productId} no es válido.` });
             }
+
+            const product = await Product.findById(item.productId).session(session);
+
+            if (!product) {
+                return res.status(404).json({ message: `El producto con id ${item.productId} no fue encontrado.` });
+            }
+
+            if (product.stock < item.quantity) {
+                return res.status(400).json({ message: `No hay suficiente stock para el producto "${product.toy_name}". Stock disponible: ${product.stock}, cantidad solicitada: ${item.quantity}` });
+            }
         }
 
+        // Reducir el stock de los productos
+        for (let item of items) {
+            const product = await Product.findById(item.productId).session(session); 
+            product.stock -= item.quantity; 
+            await product.save({ session }); 
+        }
+
+        // Crear la nueva orden
         const newOrder = new Order({
             userId,
             name,
@@ -36,22 +56,18 @@ export const createOrder = async (req, res) => {
             createdAt: new Date()
         });
 
-        await newOrder.save();
+        await newOrder.save({ session });
+        await session.commitTransaction(); 
+        session.endSession(); 
 
-        res.status(201).json({ message: 'Order placed successfully', order: newOrder });
+        
+        const populatedOrder = await Order.findById(newOrder._id).populate('items.productId');
+
+        res.status(201).json({ message: 'Orden creada exitosamente', order: populatedOrder });
     } catch (error) {
+        await session.abortTransaction(); 
+        session.endSession(); 
         console.error('Error al procesar la orden:', error);
-        res.status(500).json({ message: 'Failed to place order', error: error.message });
+        res.status(500).json({ message: 'Error al crear la orden', error: error.message });
     }
-};
-
-export const getOrdersByUser = async (req, res) => {
-    try {
-        const userEmail = req.user.email;
-        const orders = await Order.find({ email: userEmail });
-        res.status(200).json({ orders });
-    } catch (error) {
-        console.error('Error al obtener las ordenes:', error);
-        res.status(500).json({ message: 'Failed to get orders', error: error.message });
-    }    
 };
