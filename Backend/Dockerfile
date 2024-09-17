@@ -1,19 +1,23 @@
-# Usa una imagen base, por ejemplo, Node.js
-FROM node:18
-
-# Establece el directorio de trabajo en el contenedor
-WORKDIR /app
-
-# Copia los archivos de tu proyecto al contenedor
-COPY package*.json ./
+# Etapa 1: Construcción del frontend (Vite)
+FROM node:16-alpine AS frontend-build
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
 RUN npm install
-COPY . .
+COPY frontend/ ./
+RUN npm run build
 
-# Copia las imágenes a la carpeta de activos del contenedor
-COPY public/images /usr/src/app/public/images
+# Etapa 2: Configuración del backend
+FROM node:16-alpine
+WORKDIR /app
+COPY backend/package*.json ./
+RUN npm install
+COPY backend/ ./
 
-# Expon el puerto en el que tu aplicación escucha
+# Copiar los archivos estáticos del frontend construido al backend
+COPY --from=frontend-build /app/frontend/dist ./public
+
+# Exponer el puerto en el que la aplicación escuchará
 EXPOSE 8081
 
-# Define el comando para iniciar tu aplicación
+# Comando para iniciar el backend
 CMD ["npm", "start"]
