@@ -77,7 +77,32 @@ export const createProduct = async (req, res) => {
     const { toy_name, manufacturer, age_group, price, material, color, description, category, imageUrl, stock } = req.body;
     try {
         await MongoSingleton.getInstance();
-        const newProduct = new Product({ toy_name, manufacturer, age_group, price, material, color, description, category, imageUrl, stock });
+
+        let uploadedImageUrl = '';
+        if (imageUrl) {
+            const uploadResult = await cloudinary.v2.uploader.upload(imageUrl, {
+                folder: 'toy_store',
+                use_filename: true,
+                unique_filename: false,
+            });
+            uploadedImageUrl = uploadResult.secure_url;
+        }
+
+        // Crear el nuevo proyecto
+        const newProduct = new Product({
+            toy_name,
+            manufacturer,
+            age_group,
+            price,
+            material,
+            color,
+            description,
+            category,
+            image: uploadedImageUrl,
+            stock
+        });
+
+        // Guardar el proyecto
         const savedProduct = await newProduct.save();
         res.status(201).json(savedProduct);
     } catch (error) {

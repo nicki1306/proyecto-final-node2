@@ -7,7 +7,7 @@ const productSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     material: { type: String, required: true },
     color: { type: String, required: true },
-    imageUrl: { type: String,default: 'https://example.com/default-image.png' },
+    imageUrl: { type: String, required: true },
     description: { type: String, default: 'Description not available' },
     category: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},

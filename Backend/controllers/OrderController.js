@@ -5,10 +5,9 @@ import mongoose from 'mongoose';
 export const createOrder = async (req, res) => {
     const session = await mongoose.startSession(); 
     session.startTransaction(); 
+
+
     try {
-        console.log('Cuerpo de la solicitud:', req.body);
-        console.log('Token recibido en el backend:', req.headers.authorization);
-        console.log('Usuario autenticado:', req.user);
 
         const { name, address, paymentMethod, items, total } = req.body;
         console.log('Datos de la orden:', { name, address, paymentMethod, items, total });
@@ -61,7 +60,7 @@ export const createOrder = async (req, res) => {
         session.endSession(); 
 
         
-        const populatedOrder = await Order.findById(newOrder._id).populate('items.productId');
+        const populatedOrder = await Order.findById(newOrder._id).populate('items.productId', 'toy_name price image');
 
         res.status(201).json({ message: 'Orden creada exitosamente', order: populatedOrder });
     } catch (error) {
