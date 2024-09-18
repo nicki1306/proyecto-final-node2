@@ -13,7 +13,7 @@ COPY ./Backend ./Backend
 RUN npm install --prefix ./Backend
 
 # Copiar los archivos estáticos del frontend construido al backend
-COPY --from=frontend-build /app/frontend/dist ./backend/public
+COPY --from=frontend-build /app/frontend/dist ./Backend/public
 
 # Exponer el puerto en el que la aplicación escuchará
 EXPOSE 8081
