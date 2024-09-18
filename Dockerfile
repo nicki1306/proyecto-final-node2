@@ -9,8 +9,8 @@ RUN npm run build
 # Etapa 2: Configuración del backend
 FROM node:16-alpine
 WORKDIR /app
-COPY ./backend ./backend
-RUN npm install --prefix ./backend
+COPY ./Backend ./Backend
+RUN npm install --prefix ./Backend
 
 # Copiar los archivos estáticos del frontend construido al backend
 COPY --from=frontend-build /app/frontend/dist ./backend/public
@@ -19,4 +19,5 @@ COPY --from=frontend-build /app/frontend/dist ./backend/public
 EXPOSE 8081
 
 # Comando para iniciar el backend
-CMD ["npm", "start", "--prefix", "backend"]
+CMD ["npm", "start"]
+
