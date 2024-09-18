@@ -11,17 +11,17 @@ RUN npm run build
 
 # Etapa 2: Configuración del backend
 FROM node:16-alpine
-WORKDIR /app/backend
+WORKDIR /app/Backend
 
 # Copiar archivos del backend
-COPY backend/package*.json ./
+COPY Backend/package*.json ./
 RUN npm install
 
 # Copiar archivos del frontend construidos al backend
 COPY --from=frontend-build /app/frontend/dist ./public
 
 # Copiar el resto de los archivos del backend
-COPY backend/ ./
+COPY Backend/ ./
 
 # Exponer el puerto
 EXPOSE 8081
