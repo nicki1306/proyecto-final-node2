@@ -6,9 +6,7 @@ export const createOrder = async (req, res) => {
     const session = await mongoose.startSession(); 
     session.startTransaction(); 
 
-
     try {
-
         const { name, address, paymentMethod, items, total } = req.body;
         console.log('Datos de la orden:', { name, address, paymentMethod, items, total });
 
@@ -19,7 +17,6 @@ export const createOrder = async (req, res) => {
             return res.status(400).json({ message: 'Faltan datos para completar la orden.' });
         }
 
-        // Verificar stock disponible
         for (let item of items) {
             if (!mongoose.isValidObjectId(item.productId)) {
                 return res.status(400).json({ message: `El productId ${item.productId} no es válido.` });
@@ -33,6 +30,11 @@ export const createOrder = async (req, res) => {
 
             if (product.stock < item.quantity) {
                 return res.status(400).json({ message: `No hay suficiente stock para el producto "${product.toy_name}". Stock disponible: ${product.stock}, cantidad solicitada: ${item.quantity}` });
+            }
+
+            if (!product.imageUrl) {
+                product.imageUrl = 'https://ruta/a/imagen_default.jpg';  
+                await product.save({ session });  
             }
         }
 
@@ -59,8 +61,8 @@ export const createOrder = async (req, res) => {
         await session.commitTransaction(); 
         session.endSession(); 
 
-        
-        const populatedOrder = await Order.findById(newOrder._id).populate('items.productId', 'toy_name price image');
+        const populatedOrder = await Order.findById(newOrder._id)
+            .populate('items.productId', 'toy_name price imageUrl');
 
         res.status(201).json({ message: 'Orden creada exitosamente', order: populatedOrder });
     } catch (error) {
