@@ -1,5 +1,5 @@
 # Etapa 1: Construcción del frontend
-FROM node:16-alpine AS frontend-build
+FROM node:18-alpine AS frontend-build
 WORKDIR /app/frontend
 
 # Copiar el archivo package.json y package-lock.json
@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # Etapa 2: Configuración del backend (si lo combinas con el backend)
-FROM node:16-alpine AS backend-build
+FROM node:18-alpine AS backend-build
 WORKDIR /app/Backend
 
 COPY Backend/package*.json ./
