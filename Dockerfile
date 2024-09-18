@@ -9,9 +9,9 @@ RUN npm run build
 # Etapa 2: Configuración del backend
 FROM node:16-alpine
 WORKDIR /app
-COPY backend/package*.json ./
+COPY Backend/package*.json ./
 RUN npm install
-COPY backend/ ./
+COPY Backend/ ./
 
 # Copiar los archivos estáticos del frontend construido al backend
 COPY --from=frontend-build /app/frontend/dist ./public
