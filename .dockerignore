@@ -1,1 +1,3 @@
-node_modules
+nnode_modules
+.git
+dist
