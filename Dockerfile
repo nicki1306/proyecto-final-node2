@@ -3,7 +3,7 @@ FROM node:16-alpine AS frontend-build
 WORKDIR /app/frontend
 
 # Copiar el archivo package.json y package-lock.json
-COPY frontend/package*.json ./
+COPY ./frontend/package*.json ./
 
 # Instalar las dependencias
 RUN npm install
