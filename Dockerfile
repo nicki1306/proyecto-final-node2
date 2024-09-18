@@ -1,23 +1,30 @@
-# Etapa 1: Construcción del frontend (Vite)
+# Etapa 1: Construcción del frontend
 FROM node:16-alpine AS frontend-build
 WORKDIR /app/frontend
+
+# Copiar archivos del frontend
 COPY frontend/package*.json ./
 RUN npm install
+
 COPY frontend/ ./
 RUN npm run build
 
 # Etapa 2: Configuración del backend
 FROM node:16-alpine
-WORKDIR /app
-COPY Backend/package*.json ./Backend/
-RUN npm install --prefix ./Backend
-COPY Backend/ ./Backend
+WORKDIR /app/backend
 
-# Copiar los archivos estáticos del frontend construidos al backend
-COPY --from=frontend-build /app/frontend/dist ./Backend/public
+# Copiar archivos del backend
+COPY backend/package*.json ./
+RUN npm install
 
-# Exponer el puerto en el que la aplicación escuchará
+# Copiar archivos del frontend construidos al backend
+COPY --from=frontend-build /app/frontend/dist ./public
+
+# Copiar el resto de los archivos del backend
+COPY backend/ ./
+
+# Exponer el puerto
 EXPOSE 8081
 
 # Comando para iniciar el backend
-CMD ["npm", "start", "--prefix", "Backend"]
+CMD ["npm", "start"]
