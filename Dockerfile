@@ -1,33 +1,24 @@
 # Etapa 1: Construcción del frontend
 FROM node:18-alpine AS frontend-build
 WORKDIR /app/frontend
-
-# Copiar el archivo package.json y package-lock.json
-COPY ./frontend/package*.json ./
-
-# Instalar las dependencias
+COPY frontend/package*.json ./
 RUN npm install
-
-# Copiar el resto del código fuente del frontend
-COPY ./frontend/ /app/frontend/
-
-# Construir el frontend
+COPY frontend/ ./
 RUN npm run build
 
-# Etapa 2: Configuración del backend y el frontend
+# Etapa 2: Construcción del backend
 FROM node:18-alpine AS backend-build
 WORKDIR /app/Backend
-
-# Copiar los archivos de configuración del backend
 COPY Backend/package*.json ./
 RUN npm install
-
-# Copiar los archivos del backend y el build del frontend
 COPY Backend/ ./
-COPY --from=frontend-build /app/frontend/dist ./public
 
-# Exponer el puerto
+# Copiar los archivos construidos del frontend al backend
+COPY --from=frontend-build /app/frontend/dist /app/Backend/public
+
+
+# Exponer el puerto del backend
 EXPOSE 8081
 
-# Comando para iniciar el backend
+# Comando para ejecutar la aplicación
 CMD ["npm", "start"]
