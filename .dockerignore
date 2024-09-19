@@ -1,3 +1,6 @@
 nnode_modules
 .git
 dist
+.vscode
+*.log
+.DS_Store

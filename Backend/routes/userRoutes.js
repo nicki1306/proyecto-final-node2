@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser } from '../controllers/UserController.js';
+import { registerUser, loginUser, getAllUsers, deleteInactiveUsers } from '../controllers/UserController.js';
 import passport from 'passport';
 
 const router = express.Router();
@@ -9,6 +9,12 @@ router.post('/register', registerUser);
 
 // Ruta de inicio de sesión (acceso sin token JWT)
 router.post('/login', loginUser);
+
+// Ruta para obtener todos los usuarios
+router.get('/', getAllUsers); 
+
+// Ruta para eliminar usuarios inactivos
+router.delete('/', deleteInactiveUsers);
 
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/auth/google/callback', passport.authenticate('google', {
