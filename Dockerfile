@@ -13,6 +13,8 @@ COPY Backend/package*.json ./
 RUN npm install
 COPY Backend/ ./
 
+RUN npm install bcrypt --build-from-source
+
 # Copiar los archivos construidos del frontend al backend
 COPY --from=frontend-build /app/frontend/dist /app/Backend/public
 
