@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "test": "mocha test/supertest.test.js",
-    "start": "nodemon App.js npm start",
+    "start": "node App.js npm start",
     "dev": "nodemon App.js npm start",
-    "build": "npm run build"
+    "build": "echo 'No build step for backend'"
+
   },
   "keywords": [],
   "author": "",
