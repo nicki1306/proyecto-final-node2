@@ -94,7 +94,7 @@ if (cluster.isPrimary) {
             const upload = multer({ storage });
 
             const isProduccion = process.env.NODE_ENV === 'production';
-            const origin = isProduccion ? 'https://frontend-nine-lilac-98.vercel.app/' : 'http://localhost:5173';
+            const origin = isProduccion ? 'https://frontend-nine-lilac-98.vercel.app' : 'http://localhost:5173';
             console.log('Origen:', origin);
 
             // Middlewares
