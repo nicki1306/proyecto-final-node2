@@ -94,7 +94,7 @@ if (cluster.isPrimary) {
             const upload = multer({ storage });
 
             const isProduccion = process.env.NODE_ENV === 'production';
-            const origin = isProduccion ? 'https://backend-production-55b2.up.railway.app' : 'http://localhost:3000';
+            const origin = isProduccion ? 'https://backend-production-55b2.up.railway.app' : 'http://localhost:5173';
             console.log('Origen:', origin);
 
             // Middlewares
