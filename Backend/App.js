@@ -93,13 +93,16 @@ if (cluster.isPrimary) {
 
             const upload = multer({ storage });
 
+            const isProduccion = process.env.NODE_ENV === 'production';
+            const origin = isProduccion ? 'https://backend-production-55b2.up.railway.app' : 'http://localhost:3000';
+
             // Middlewares
             app.use(express.json());
             app.use(express.urlencoded({ extended: true }));
             app.use(express.static(path.join(__dirname, '../frontend/dist')));
             app.use(Compression({ brotli: { enabled: true }, gzip: { enabled: true } }));
             app.use(cors({
-                origin: 'http://localhost:3000',
+                origin: origin,
                 credentials: true,
                 methods: ['GET', 'POST', 'PUT', 'DELETE'],
             }));
