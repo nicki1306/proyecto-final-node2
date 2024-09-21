@@ -95,6 +95,7 @@ if (cluster.isPrimary) {
 
             const isProduccion = process.env.NODE_ENV === 'production';
             const origin = isProduccion ? 'https://backend-production-55b2.up.railway.app' : 'http://localhost:3000';
+            console.log('Origen:', origin);
 
             // Middlewares
             app.use(express.json());
