@@ -1,16 +1,6 @@
 import Product from '../models/ProductModel.js';
 import User from '../models/UserModel.js';
 import MongoSingleton from '../services/Mongosingleton.js';
-import nodemailer from 'nodemailer';
-
-const transport = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    auth: {
-        user: '3f5vz@example.com',
-        pass: '9sZUwVx7kQbJn4kVJG'
-    }
-});
 
 // Obtener todos los productos 
 export const getProducts = async (req, res) => {

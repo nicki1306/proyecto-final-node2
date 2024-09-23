@@ -96,8 +96,8 @@ export const deleteInactiveUsers = async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'tu-correo@gmail.com',
-                pass: 'tu-contraseña',
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD,
             },
         });
 
