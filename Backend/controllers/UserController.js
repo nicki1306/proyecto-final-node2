@@ -69,28 +69,45 @@ export const loginUser = async (req, res) => {
 // Obtener todos los usuarios
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find({}, 'name email role'); 
-        res.status(200).json(users);
+
+        console.log('Usuario autenticado:', req.user);
+
+        if (req.user.role !== 'admin') {
+            console.log('Acceso no autorizado, el rol es:', req.user.role);
+            return res.status(403).json({ message: 'No autorizado' });
+        }
+
+        console.log('Intentando obtener usuarios desde MongoDB...');
+        const users = await User.find({}, 'name email role active last_login');
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron usuarios.' });
+        }
+        
+        console.log('Usuarios obtenidos:', users);
+        res.status(200).json({ payload: users });
     } catch (error) {
-        res.status(500).json({ message: 'Error al obtener los usuarios', error });
+        console.error('Error capturado al obtener los usuarios:', error.message);
+        console.error('Stack trace del error:', error.stack);
+        res.status(500).json({ origin: 'ATLAS', payload: '', error: 'Error no identificado: ' + error.message });
     }
 };
 
 // Eliminar usuarios inactivos
-export const deleteInactiveUsers = async (req, res) => {
+export const deleteInactiveUsers = async (req, res, next) => {
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
     try {
         // Encontrar los usuarios inactivos
-        const inactiveUsers = await User.find({ lastLogin: { $lt: twoDaysAgo } });
+        const inactiveUsers = await User.find({ last_login: { $lt: twoDaysAgo } });
 
         if (inactiveUsers.length === 0) {
             return res.status(200).json({ message: 'No hay usuarios inactivos para eliminar.' });
         }
 
         // Eliminar los usuarios inactivos
-        await User.deleteMany({ lastLogin: { $lt: twoDaysAgo } });
+        await User.deleteMany({ last_login: { $lt: twoDaysAgo } });
 
         // Configurar nodemailer para enviar correos
         const transporter = nodemailer.createTransport({
@@ -104,7 +121,7 @@ export const deleteInactiveUsers = async (req, res) => {
         // Enviar correo a cada usuario eliminado
         for (const user of inactiveUsers) {
             const mailOptions = {
-                from: 'tu-correo@gmail.com',
+                from: process.env.EMAIL,
                 to: user.email,
                 subject: 'Cuenta eliminada por inactividad',
                 text: `Hola ${user.name}, tu cuenta ha sido eliminada por inactividad.`,
@@ -115,6 +132,7 @@ export const deleteInactiveUsers = async (req, res) => {
 
         res.status(200).json({ message: `${inactiveUsers.length} usuarios eliminados por inactividad` });
     } catch (error) {
-        res.status(500).json({ message: 'Error al eliminar usuarios inactivos', error });
+        console.error('Error al eliminar usuarios inactivos:', error);
+        next(error);
     }
 };

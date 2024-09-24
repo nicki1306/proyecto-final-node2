@@ -1,6 +1,7 @@
 import express from 'express';
 import { registerUser, loginUser, getAllUsers, deleteInactiveUsers } from '../controllers/UserController.js';
 import passport from 'passport';
+import { verifyToken, isAdmin } from '../services/utils.js';
 
 const router = express.Router();
 
@@ -11,10 +12,10 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 // Ruta para obtener todos los usuarios
-router.get('/', getAllUsers); 
+router.get('/all', verifyToken, isAdmin, getAllUsers); 
 
 // Ruta para eliminar usuarios inactivos
-router.delete('/', deleteInactiveUsers);
+router.delete('/inactive', verifyToken, deleteInactiveUsers);
 
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/auth/google/callback', passport.authenticate('google', {

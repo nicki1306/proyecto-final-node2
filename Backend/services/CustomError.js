@@ -1,11 +1,16 @@
 export default class CustomError extends Error {
-    static createError({name="CustomError", message=""}, statusCode, cause) {
-        const error =new Error(message,{
-            cause: message
-        }); 
-        error.name = name;
-        error.statusCode = statusCode;
-        error.code=cause;
+    constructor({ name = 'CustomError', message = '', code = 500, status = 500, cause = null }) {
+        super(message); 
+        this.name = name;
+        this.status = status;
+        this.code = code;
+        if (cause) {
+            this.cause = cause;
+        }
+    }
+
+    static createError({ name = 'CustomError', message = '', code = 500, status = 500, cause = null }) {
+        const error = new CustomError({ name, message, code, status, cause });
         return error;
     }
 }

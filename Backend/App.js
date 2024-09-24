@@ -156,7 +156,7 @@ if (cluster.isPrimary) {
                     res.redirect('/');
                 });
             });
-
+            
             app.use('/api/upload', uploadRouter);
             app.use('/api/products', productRouter);
             app.use('/api/orders', orderRoutes);
@@ -165,9 +165,12 @@ if (cluster.isPrimary) {
             app.use('/api/user', userRouter);
             app.use('/api/test', TestRouter);
             app.use('/api/cookies', cookiesRouter);
+            
+            // Manejo de archivos estáticos
+            app.use(express.static(path.join(__dirname, '../frontend')));
 
             app.get('*', (req, res) => {
-                res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+                res.sendFile(path.join(__dirname, '../frontend/index.html'));
             });
 
             // Rutas de prueba
@@ -177,9 +180,14 @@ if (cluster.isPrimary) {
 
             // Manejo de errores
             app.use(errorsHandler);
+            app.use((err, req, res, next) => {
+                console.error('Error capturado:', err.stack); 
+                res.status(500).json({ 
+                    message: 'Ocurrió un error en el servidor', 
+                    error: err.message 
+                });
+            });
 
-            // Manejo de archivos estáticos
-            app.use('/static', express.static(`${__dirname}/public`));
 
             const expressInstance = app.listen(PORT, () => {
                 console.log(`Servidor escuchando en http://localhost:${PORT}`);

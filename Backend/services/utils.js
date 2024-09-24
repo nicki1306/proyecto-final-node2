@@ -103,9 +103,11 @@ export const handlePolicies = (allowedRoles) => {
 
 export const isAdmin = (req, res, next) => {
     const user = req.user; 
+    console.log("Usuario recibido en isAdmin:", user);
     if (user && user.role === 'admin') {
         next();  
     } else {
+        console.log("Acceso no autorizado, el rol del usuario es:", user?.role);
         return res.status(403).json({ message: 'No autorizado' });
     }
 };
