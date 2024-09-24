@@ -80,10 +80,6 @@ export const getAllUsers = async (req, res) => {
         console.log('Intentando obtener usuarios desde MongoDB...');
         const users = await User.find({}, 'name email role active last_login');
 
-        if (!users || users.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron usuarios.' });
-        }
-        
         console.log('Usuarios obtenidos:', users);
         res.status(200).json({ payload: users });
     } catch (error) {
