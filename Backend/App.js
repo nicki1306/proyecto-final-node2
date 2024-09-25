@@ -30,7 +30,7 @@ import addLogger from './services/logger.js';
 import cookiesRouter from './routes/cookies.routes.js';
 
 dotenv.config();
-
+console.log('NODE_ENV:', process.env.NODE_ENV); 
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -101,7 +101,6 @@ if (cluster.isPrimary) {
             // Middlewares
             app.use(express.json());
             app.use(express.urlencoded({ extended: true }));
-            app.use(express.static(path.join(__dirname, '../frontend/dist')));
             app.use(Compression({ brotli: { enabled: true }, gzip: { enabled: true } }));
             app.use(cors({
                 origin: origin,
@@ -156,6 +155,8 @@ if (cluster.isPrimary) {
                     res.redirect('/');
                 });
             });
+
+            // Rutas
             
             app.use('/api/upload', uploadRouter);
             app.use('/api/products', productRouter);
@@ -168,14 +169,8 @@ if (cluster.isPrimary) {
             
             // Manejo de archivos estáticos
             app.use(express.static(path.join(__dirname, '../frontend')));
-
             app.get('*', (req, res) => {
                 res.sendFile(path.join(__dirname, '../frontend/index.html'));
-            });
-
-            // Rutas de prueba
-            app.get('/hello', (req, res) => {
-                res.send('Hello World!');
             });
 
             // Manejo de errores

@@ -10,7 +10,7 @@ commandLine
 commandLine.parse();
 const clOptions = commandLine.opts();
 
-dotenv.config({ path: clOptions.server === 'prod' ? '.env.prod': '.env.dev' });
+dotenv.config({ path: clOptions.server === 'prod' ? '.env.prod': '.env' });
 console.log("Variables de entorno cargadas:", process.env.JWT_SECRET); 
 
 const config = {

@@ -20,9 +20,7 @@ class MongoSingleton {
                 console.error('Error al conectar a MongoDB:', error);
                 throw error;
             }
-        } else {
-            console.log('Instancia de MongoSingleton ya existe');
-        }
+        } else 
         return MongoSingleton.instance;
     }
 }

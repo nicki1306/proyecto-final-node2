@@ -68,6 +68,7 @@ export const loginUser = async (req, res) => {
 
 // Obtener todos los usuarios
 export const getAllUsers = async (req, res) => {
+    console.log("Entrando en la función getAllUsers");
     try {
 
         console.log('Usuario autenticado:', req.user);

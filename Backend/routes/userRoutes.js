@@ -12,10 +12,10 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 // Ruta para obtener todos los usuarios
-router.get('/all', verifyToken, isAdmin, getAllUsers); 
+router.get('/user', getAllUsers); 
 
 // Ruta para eliminar usuarios inactivos
-router.delete('/inactive', verifyToken, deleteInactiveUsers);
+router.delete('/inactive', verifyToken, isAdmin, deleteInactiveUsers);
 
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/auth/google/callback', passport.authenticate('google', {
