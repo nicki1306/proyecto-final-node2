@@ -1,6 +1,7 @@
 import UserManager from '../managers/UserManager.js';
 import User from '../models/UserModel.js';
-import bcrypt from 'bcrypt';
+import MongoSingleton from '../services/Mongosingleton.js';
+import mongoose from 'mongoose';
 import { generateToken } from '../services/utils.js';
 import nodemailer from 'nodemailer';
 
@@ -69,6 +70,7 @@ export const loginUser = async (req, res) => {
 // Obtener todos los usuarios
 export const getAllUsers = async (req, res) => {
     console.log("Entrando en la función getAllUsers");
+    console.log("usuario autenticado:", req.user);
     try {
 
         console.log('Usuario autenticado:', req.user);
@@ -90,12 +92,39 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
+export const deleteUserById = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    try {
+        await MongoSingleton.getInstance();
+        const user = await User.findByIdAndDelete(id); 
+
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        await user.deleteOne(); 
+
+        res.status(200).json({ message: 'Usuario eliminado con éxito' });
+    } catch (error) {
+        console.error('Error al eliminar el usuario:', error);
+        res.status(500).json({ message: 'Error al eliminar el usuario', error: error.message });
+    }
+};
+
+
+
 // Eliminar usuarios inactivos
 export const deleteInactiveUsers = async (req, res, next) => {
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
     try {
+        await MongoSingleton.getInstance();
+
         // Encontrar los usuarios inactivos
         const inactiveUsers = await User.find({ last_login: { $lt: twoDaysAgo } });
 
@@ -106,7 +135,7 @@ export const deleteInactiveUsers = async (req, res, next) => {
         // Eliminar los usuarios inactivos
         await User.deleteMany({ last_login: { $lt: twoDaysAgo } });
 
-        // Configurar nodemailer para enviar correos
+        // Configurar nodemailer 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -116,7 +145,7 @@ export const deleteInactiveUsers = async (req, res, next) => {
         });
 
         // Enviar correo a cada usuario eliminado
-        for (const user of inactiveUsers) {
+        const emailPromises = inactiveUsers.map(async (user) => {
             const mailOptions = {
                 from: process.env.EMAIL,
                 to: user.email,
@@ -124,12 +153,34 @@ export const deleteInactiveUsers = async (req, res, next) => {
                 text: `Hola ${user.name}, tu cuenta ha sido eliminada por inactividad.`,
             };
 
-            await transporter.sendMail(mailOptions);
-        }
+            try {
+                await transporter.sendMail(mailOptions);
+                console.log(`Correo enviado a: ${user.email}`);
+            } catch (error) {
+                console.error(`Error al enviar correo a ${user.email}:`, error);
+            }
+        });
 
-        res.status(200).json({ message: `${inactiveUsers.length} usuarios eliminados por inactividad` });
+        await Promise.all(emailPromises);
+
+        res.status(200).json({ message: `${inactiveUsers.length} usuarios eliminados por inactividad.` });
     } catch (error) {
         console.error('Error al eliminar usuarios inactivos:', error);
         next(error);
+    }
+};
+
+export const updateUserById = async (req, res) => {
+    const { id } = req.params;
+    const updates = req.body;
+    
+    try {
+        const user = await User.findByIdAndUpdate(id, updates, { new: true });
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.status(200).json({ message: 'Usuario actualizado correctamente', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el usuario', error: error.message });
     }
 };

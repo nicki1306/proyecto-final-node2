@@ -21,13 +21,14 @@ export const generateToken = (user) => {
         role: user.role
     };
     console.log("JWT_SECRET utilizado para generar el token:", process.env.JWT_SECRET);
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 };
 
 
 export const verifyToken = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
+        console.error("Token no proporcionado en la solicitud.");
         return res.status(403).json({ message: 'Token no proporcionado' });
     }
 

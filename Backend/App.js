@@ -26,7 +26,7 @@ import productRouter from './routes/productRoutes.js';
 import cartRouter from './routes/CartRoutes.js';
 import orderRoutes from './routes/orderroutes.js';
 import userRouter from './routes/userRoutes.js';
-import addLogger from './services/logger.js';
+import {addLogger} from './services/logger.js';
 import cookiesRouter from './routes/cookies.routes.js';
 
 dotenv.config();
@@ -167,11 +167,8 @@ if (cluster.isPrimary) {
             app.use('/api/test', TestRouter);
             app.use('/api/cookies', cookiesRouter);
             
-            // Manejo de archivos estáticos
+            //Manejo de archivos estáticos
             app.use(express.static(path.join(__dirname, '../frontend')));
-            app.get('*', (req, res) => {
-                res.sendFile(path.join(__dirname, '../frontend/index.html'));
-            });
 
             // Manejo de errores
             app.use(errorsHandler);
