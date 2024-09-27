@@ -170,17 +170,24 @@ export const deleteInactiveUsers = async (req, res, next) => {
     }
 };
 
-export const updateUserById = async (req, res) => {
+export const updateUserRoleById = async (req, res) => {
     const { id } = req.params;
-    const updates = req.body;
-    
+    const { role } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
     try {
-        const user = await User.findByIdAndUpdate(id, updates, { new: true });
+        await MongoSingleton.getInstance();
+        const user = await User.findByIdAndUpdate(id, { role }, { new: true });
+
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
-        res.status(200).json({ message: 'Usuario actualizado correctamente', user });
+
+        res.status(200).json({ message: 'Rol actualizado correctamente', user });
     } catch (error) {
-        res.status(500).json({ message: 'Error al actualizar el usuario', error: error.message });
+        res.status(500).json({ message: 'Error al actualizar el rol del usuario', error: error.message });
     }
 };

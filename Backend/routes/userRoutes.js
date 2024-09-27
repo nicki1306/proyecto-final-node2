@@ -1,14 +1,12 @@
 import express from 'express';
-import { registerUser, loginUser, getAllUsers, deleteInactiveUsers, deleteUserById } from '../controllers/UserController.js';
+import { registerUser, loginUser, getAllUsers, deleteInactiveUsers, deleteUserById, updateUserRoleById } from '../controllers/UserController.js';
 import passport from 'passport';
 import { verifyToken, isAdmin } from '../services/utils.js';
 
 const router = express.Router();
 
-// Ruta de registro (acceso sin token JWT)
 router.post('/register', registerUser);
 
-// Ruta de inicio de sesión (acceso sin token JWT)
 router.post('/login', loginUser);
 
 // Ruta para obtener todos los usuarios
@@ -18,6 +16,9 @@ router.get('/', verifyToken, isAdmin, getAllUsers);
 router.delete('/inactive', verifyToken, isAdmin, deleteInactiveUsers);
 
 router.delete('/:id', verifyToken, isAdmin, deleteUserById);
+
+router.put('/role/:id', verifyToken, isAdmin, updateUserRoleById);
+
 
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/auth/google/callback', passport.authenticate('google', {
