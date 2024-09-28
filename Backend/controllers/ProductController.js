@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 import cloudinary from 'cloudinary';
 
 
-const transport = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL,
@@ -130,19 +130,24 @@ export const deleteProduct = async (req, res) => {
             return res.status(404).json({ message: 'Producto no encontrado' });
         }
 
-        // Buscar al usuario asociado al producto eliminado (si existe userId)
+        // Buscar al usuario asociado al producto eliminado
         if (deletedProduct.userId) {
             const user = await User.findById(deletedProduct.userId);
             if (user && user.role === 'premium') {
                 const mailOptions = {
-                    from: 'tuemail@gmail.com',
+                    from: process.env.EMAIL,
                     to: user.email,
                     subject: 'Producto eliminado',
                     text: `Estimado/a ${user.first_name}, su producto "${deletedProduct.toy_name}" ha sido eliminado.`
                 };
                 
                 // Enviar el correo al usuario
-                await transport.sendMail(mailOptions);
+                try {
+                    await transporter.sendMail(mailOptions);
+                    console.log(`Correo enviado a: ${user.email}`);
+                } catch (error) {
+                    console.error(`Error al enviar correo a ${user.email}:`, error);
+                }
             }
         }
 

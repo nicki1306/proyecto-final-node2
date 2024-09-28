@@ -4,8 +4,10 @@ import mongoose from 'mongoose';
 
 // Obtener el carrito del usuario
 export const getCart = async (req, res) => {
+    const { userId } = req.params;
+
     try {
-        const cart = await Cart.findOne({ userId: req.user._id }).populate('products.productId');
+        const cart = await Cart.findOne({ userId }).populate('products.productId');
         if (!cart) {
             return res.status(404).json({ message: 'Carrito no encontrado' });
         }
